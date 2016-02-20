@@ -117,7 +117,7 @@ const_value = 0
 	const EVENT_BEAT_PEWTER_GYM_TRAINER_0            ; 072, (D755, bit 2)
 	const EVENT_073                                  ; 073, (D755, bit 3)
 	const EVENT_074                                  ; 074, (D755, bit 4)
-	const EVENT_075                                  ; 075, (D755, bit 5)
+	const EVENT_BROCK_GAVE_RARE_CANDY                ; 075, (D755, bit 5)
 	const EVENT_GOT_TM34                             ; 076, (D755, bit 6)
 	const EVENT_BEAT_BROCK                           ; 077, (D755, bit 7)
 	const EVENT_078                                  ; 078, (D756, bit 0)

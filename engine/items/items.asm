@@ -150,7 +150,14 @@ ItemUseBall: ; d687 (3:5687)
 	callab IsGhostBattle
 	ld b,$10 ; can't be caught value
 	jp z,.setAnimData
-
+	
+	ld a, [wEnemyMonSpecies2]
+	ld hl, BirdLikePokemon
+	ld de, $1
+	call IsInArray
+	ld b, $11
+	jp c, .setAnimData
+	
 	ld a,[wBattleType]
 	dec a
 	jr nz,.notOldManBattle
@@ -440,6 +447,9 @@ ItemUseBall: ; d687 (3:5687)
 	cp a,$10
 	ld hl,ItemUseBallText00
 	jp z,.printMessage
+	cp a,$11
+	ld hl,ItemUseBallText09
+	jp z,.printMessage
 	cp a,$20
 	ld hl,ItemUseBallText01
 	jp z,.printMessage
@@ -619,12 +629,27 @@ ItemUseBallText08: ; d95c (3:595c)
 	TX_FAR _ItemUseBallText08
 	db "@"
 
+ItemUseBallText09:
+	TX_FAR _ItemUseBallText09
+	db "@"
+
 ItemUseBallText06: ; d961 (3:5961)
 ;"New DEX data will be added..."
 ;play sound
 	TX_FAR _ItemUseBallText06
 	db $13,$06
 	db "@"
+
+BirdLikePokemon:
+	db PIDGEY
+	db PIDGEOTTO
+	db PIDGEOT
+	db SPEAROW
+	db FEAROW
+	db DODUO
+	db DODRIO
+	db FARFETCHD
+	db $ff
 
 ItemUseTownMap: ; d968 (3:5968)
 	ld a,[wIsInBattle]

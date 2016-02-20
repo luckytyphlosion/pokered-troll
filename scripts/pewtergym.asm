@@ -115,6 +115,27 @@ PewterGymText1: ; 5c44e (17:444e)
 .asm_5c46a
 	ld hl, PewterGymText_5c49e
 	call PrintText
+	ld a, [wPlayerStarter]
+	ld de, $1
+	ld hl, wPartySpecies
+	call IsInArray
+	jr nc, .regularText
+	ld hl, wPartyMon1Level
+	ld a, b
+	ld bc, wPartyMon2 - wPartyMon1
+	call AddNTimes
+	ld a, [hl]
+	cp $8
+	jr nc, .regularText
+; if squirtle/starter is level 7
+	CheckAndSetEvent EVENT_BROCK_GAVE_RARE_CANDY
+	jr nz, .regularText
+	ld hl, PewterGymText_BrockPity1
+	jr .printPityText
+.regularText
+	ld hl, PewterGymText_BrockTextContinued
+.printPityText
+	call PrintText
 	ld hl, wd72d
 	set 6, [hl]
 	set 7, [hl]
@@ -134,6 +155,25 @@ PewterGymText1: ; 5c44e (17:444e)
 	ld [wCurMapScript], a
 .asm_5c49b
 	jp TextScriptEnd
+
+PewterGymText_BrockPity1:
+	TX_FAR _PewterGymText_BrockPity1
+	TX_ASM
+	lb bc, RARE_CANDY, 1
+	call GiveItem
+	ld hl, PewterGymText_BrockPity2
+	call PrintText
+	jp TextScriptEnd
+
+PewterGymText_BrockPity2:
+	TX_FAR _PewterGymText_BrockPity2
+	db $0b
+	TX_FAR _PewterGymText_BrockPity3
+
+; fallthrough
+PewterGymText_BrockTextContinued:
+	TX_FAR _PewterGymText_BrockTextContinued
+	db "@"
 
 PewterGymText_5c49e: ; 5c49e (17:449e)
 	TX_FAR _PewterGymText_5c49e

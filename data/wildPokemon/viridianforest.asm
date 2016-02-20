@@ -1,5 +1,5 @@
 ForestMons:
-	db $08
+	db $00
 	IF DEF(_RED)
 		db 4,WEEDLE
 		db 5,KAKUNA

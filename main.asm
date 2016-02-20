@@ -2974,9 +2974,9 @@ LoadWildData: ; ceb8 (3:4eb8)
 	ld bc,$0014
 	jp CopyData
 
-INCLUDE "data/wild_mons.asm"
-
 INCLUDE "engine/items/items.asm"
+
+INCLUDE "data/wild_mons.asm"
 
 DrawBadges: ; ea03 (3:6a03)
 ; Draw 4x2 gym leader faces, with the faces replaced by

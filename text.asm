@@ -2771,6 +2771,14 @@ INCLUDE "text/maps/fuchsia_city.asm"
 INCLUDE "text/maps/cinnabar_island.asm"
 INCLUDE "text/maps/saffron_city.asm"
 
+_PokemonDodgedAttackText::
+	text "It dodged the"
+	line "#MON's attack!"
+	
+	para "This #MON"
+	line "can't be hit!"
+	prompt
+	
 _ItemUseBallText00::
 	text "It dodged the"
 	line "thrown BALL!"
@@ -2826,6 +2834,15 @@ _ItemUseBallText06::
 	cont "@"
 	TX_RAM wEnemyMonNick
 	text "!@@"
+
+_ItemUseBallText09::
+	text "It dodged the"
+	line "thrown BALL!"
+
+	para "This generic"
+	line "bird #MON"
+	cont "can't be caught!"
+	prompt
 
 _SurfingGotOnText::
 	text $52, " got on"

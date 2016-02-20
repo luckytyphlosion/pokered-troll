@@ -48,10 +48,10 @@ TryDoWildEncounter: ; 13870 (4:7870)
 .CanEncounter
 ; compare encounter chance with a random number to determine if there will be an encounter
 	ld b, a
-	ld a, [hRandomAdd]
+	ld a, [hRandomSub] ; screw with dsum
 	cp b
 	jr nc, .CantEncounter2
-	ld a, [hRandomSub]
+	ld a, [hRandomAdd]
 	ld b, a
 	ld hl, WildMonEncounterSlotChances
 .determineEncounterSlot

@@ -422,6 +422,8 @@ MoveAnimation: ; 78d5e (1e:4d5e)
 	pop hl
 	ret
 
+
+
 ShareMoveAnimations: ; 78da6 (1e:4da6)
 ; some moves just reuse animations from status conditions
 	ld a,[H_WHOSETURN]
@@ -748,9 +750,12 @@ DoBallTossSpecialEffects: ; 78f3e (1e:4f3e)
 	cp a,02 ; is it a trainer battle?
 	jr z,.isTrainerBattle
 	ld a,[wd11e]
+	cp $11
+	jr z, .haveMonDodgeBall
 	cp a,$10 ; is the enemy pokemon the Ghost Marowak?
 	ret nz
 ; if the enemy pokemon is the Ghost Marowak, make it dodge during the last 3 frames
+.haveMonDodgeBall
 	ld a,[wSubAnimCounter]
 	cp a,3
 	jr z,.moveGhostMarowakLeft
@@ -759,18 +764,7 @@ DoBallTossSpecialEffects: ; 78f3e (1e:4f3e)
 	cp a,1
 	ret nz
 .moveGhostMarowakLeft
-	coord hl, 17, 0
-	ld de,20
-	lb bc, 7, 7
-.loop
-	push hl
-	push bc
-	call AnimCopyRowRight ; move row of tiles left
-	pop bc
-	pop hl
-	add hl,de
-	dec b
-	jr nz,.loop
+	call MoveMonPicRight
 	ld a,%00001000
 	ld [rNR10],a ; Channel 1 sweep register
 	ret
@@ -780,6 +774,21 @@ DoBallTossSpecialEffects: ; 78f3e (1e:4f3e)
 	ret nz
 	dec a
 	ld [wSubAnimCounter],a
+	ret
+
+MoveMonPicRight:
+	coord hl, 17, 0
+	ld de, SCREEN_WIDTH
+	lb bc, 7, 7
+.loop
+	push hl
+	push bc
+	call AnimCopyRowRight ; move row of tiles right
+	pop bc
+	pop hl
+	add hl,de
+	dec b
+	jr nz,.loop
 	ret
 
 DoBallShakeSpecialEffects: ; 78f96 (1e:4f96)

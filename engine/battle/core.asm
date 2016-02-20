@@ -95,7 +95,35 @@ SpecialEffectsCont: ; 3c049 (f:4049)
 	db THRASH_PETAL_DANCE_EFFECT
 	db TRAPPING_EFFECT
 	db -1
-
+	
+UsedOnAttackingMonEffects:
+; effects that do not involve the enemy mon in any way
+; metronome and bide are special cases, where bide doesn't directly damage the mon, while metronome reloads a move
+	db CONVERSION_EFFECT
+	db SWITCH_AND_TELEPORT_EFFECT
+	db MIST_EFFECT
+	db FOCUS_ENERGY_EFFECT
+	db HEAL_EFFECT
+	db LIGHT_SCREEN_EFFECT
+	db REFLECT_EFFECT
+	db SUBSTITUTE_EFFECT
+	db SPLASH_EFFECT
+	db ATTACK_UP1_EFFECT
+	db DEFENSE_UP1_EFFECT
+	db SPEED_UP1_EFFECT
+	db SPECIAL_UP1_EFFECT
+	db ACCURACY_UP1_EFFECT
+	db EVASION_UP1_EFFECT
+	db BIDE_EFFECT
+	db ATTACK_UP2_EFFECT
+	db DEFENSE_UP2_EFFECT
+	db SPEED_UP2_EFFECT
+	db SPECIAL_UP2_EFFECT
+	db ACCURACY_UP2_EFFECT
+	db EVASION_UP2_EFFECT
+	db METRONOME_EFFECT
+	db $ff
+	
 SlidePlayerAndEnemySilhouettesOnScreen: ; 3c04c (f:404c)
 	call LoadPlayerBackPic
 	ld a, MESSAGE_BOX ; the usual text box at the bottom of the screen
@@ -3132,6 +3160,24 @@ LinkBattleExchangeData: ; 3d605 (f:5605)
 	jr nz, .syncLoop3
 	ret
 
+PokemonDodgedAttackText:
+	TX_FAR _PokemonDodgedAttackText
+	db "@"
+
+AnimateDodgingMon:
+	ld a, $3
+.loop
+	push af
+	callab MoveMonPicRight
+	call Delay3
+	pop af
+	dec a
+	jr nz, .loop
+	ld hl, PokemonDodgedAttackText
+	call PrintText
+	coord hl, 12, 0
+	predef_jump CopyUncompressedPicToTilemap
+	
 ExecutePlayerMove: ; 3d65e (f:565e)
 	xor a
 	ld [H_WHOSETURN], a ; set player's turn
@@ -3181,6 +3227,24 @@ PlayerCanExecuteMove: ; 3d6b0 (f:56b0)
 	ld de,wPlayerSelectedMove ; pointer to the move just used
 	ld b,BANK(DecrementPP)
 	call Bankswitch
+	
+	ld a, [wCurMap]
+	cp ROUTE_22
+	jr nz, .notTrollGrass
+	ld a, [wIsInBattle]
+	dec a
+	jr nz, .notTrollGrass
+	ld a, [wPlayerMoveEffect]
+	ld hl, UsedOnAttackingMonEffects
+	ld de, $1
+	call IsInArray
+	jr c, .notTrollGrass
+	ld c, 15
+	call DelayFrames
+	call AnimateDodgingMon
+	jp ExecutePlayerMoveDone
+	
+.notTrollGrass
 	ld a,[wPlayerMoveEffect] ; effect of the move just used
 	ld hl,ResidualEffects1
 	ld de,1
@@ -3207,7 +3271,7 @@ PlayerCalcMoveDamage: ; 3d6dc (f:56dc)
 	               ; for these moves, accuracy tests will only occur if they are called as part of the effect itself
 	call AdjustDamageForMoveType
 	call RandomizeDamage
-.moveHitTest
+.moveHitTest	
 	call MoveHitTest
 handleIfPlayerMoveMissed
 	ld a,[wMoveMissed]
@@ -3566,6 +3630,17 @@ CheckPlayerStatusConditions: ; 3d854 (f:5854)
 	res StoringEnergy,[hl] ; not using bide any more
 	ld hl,UnleashedEnergyText
 	call PrintText
+	
+	ld a, [wCurMap]
+	cp ROUTE_22
+	jr nz, .notTrollGrass
+	ld a, [wIsInBattle]
+	dec a
+	jr nz, .notTrollGrass
+	call AnimateDodgingMon
+	ld hl, ExecutePlayerMoveDone
+	jp .returnToHL
+.notTrollGrass
 	ld a,1
 	ld [wPlayerMovePower],a
 	ld hl,wPlayerBideAccumulatedDamage + 1
