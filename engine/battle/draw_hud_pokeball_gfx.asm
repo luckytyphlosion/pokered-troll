@@ -2,8 +2,8 @@ DrawAllPokeballs: ; 3a849 (e:6849)
 	call LoadPartyPokeballGfx
 	call SetupOwnPartyPokeballs
 	ld a, [wIsInBattle]
-	dec a
-	ret z ; return if wild pokémon
+	cp $2
+	ret nz
 	jp SetupEnemyPartyPokeballs
 
 DrawEnemyPokeballs: ; 3a857 (e:6857)

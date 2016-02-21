@@ -1488,6 +1488,10 @@ _GhostCantBeIDdText::
 	line "can't be ID'd!"
 	prompt
 
+_ButNobodyCameText::
+	text "But nobody came@@"
+
+	
 _GoText::
 	text "Go! @@"
 

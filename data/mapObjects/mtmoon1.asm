@@ -22,7 +22,7 @@ MtMoon1Object: ; 0x49b06 (size=145)
 	object SPRITE_BALL, $2, $14, STAY, NONE, $8, POTION
 	object SPRITE_BALL, $2, $2, STAY, NONE, $9, MOON_STONE
 	object SPRITE_BALL, $23, $1f, STAY, NONE, $a, RARE_CANDY
-	object SPRITE_BALL, $24, $17, STAY, NONE, $b, ESCAPE_ROPE
+	object SPRITE_BALL, $24, $17, STAY, NONE, $b, TOWN_MAP
 	object SPRITE_BALL, $14, $21, STAY, NONE, $c, POTION
 	object SPRITE_BALL, $5, $20, STAY, NONE, $d, TM_12
 

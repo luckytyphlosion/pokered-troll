@@ -164,6 +164,21 @@ SlidePlayerAndEnemySilhouettesOnScreen: ; 3c04c (f:404c)
 .noCarry
 	dec b
 	jr nz, .copyRowLoop
+	ld a, [wIsInBattle]
+	dec a
+	jr nz, .regularEncounter
+	ld a, [wCurMap]
+	ld hl, ButNobodyCameMaps
+	ld de, $1
+	call IsInArray
+	jr nc, .regularEncounter
+	ld hl, vFrontPic
+	ld bc, $31 * $10
+	xor a
+	call FillMemory
+	ld a, $3
+	ld [wIsInBattle], a
+.regularEncounter
 	call EnableLCD
 	ld a, $90
 	ld [hWY], a
@@ -216,6 +231,17 @@ SlidePlayerAndEnemySilhouettesOnScreen: ; 3c04c (f:404c)
 	call RunPaletteCommand
 	call HideSprites
 	jpab PrintBeginningBattleText
+
+ButNobodyCameMaps:
+	db MT_MOON_1
+	db MT_MOON_2
+	db MT_MOON_3
+	db ROUTE_4
+	db ROUTE_24
+	db ROUTE_25
+	db ROUTE_5
+	db ROUTE_6
+	db $ff
 
 ; when a battle is starting, silhouettes of the player's pic and the enemy's pic are slid onto the screen
 ; the lower of the player's pic (his body) is part of the background, but his head is a sprite
@@ -7040,9 +7066,12 @@ _InitBattleCommon: ; 3efeb (f:6feb)
 	call ClearScreenArea
 	call ClearSprites
 	ld a, [wIsInBattle]
+	cp $3
+	jr z, .endBattle
 	dec a ; is it a wild battle?
 	call z, DrawEnemyHUDAndHPBar ; draw enemy HUD and HP bar if it's a wild battle
 	call StartBattle
+.endBattle
 	callab EndOfBattle
 	pop af
 	ld [wLetterPrintingDelayFlags], a

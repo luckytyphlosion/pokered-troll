@@ -1,5 +1,7 @@
 PrintBeginningBattleText: ; 58d99 (16:4d99)
 	ld a, [wIsInBattle]
+	cp $3
+	jr z, .noEncounterBattle
 	dec a
 	jr nz, .trainerBattle
 	ld a, [wCurMap]
@@ -17,6 +19,16 @@ PrintBeginningBattleText: ; 58d99 (16:4d99)
 	ld hl, HookedMonAttackedText
 .notFishing
 	jr .wildBattle
+.noEncounterBattle
+	ld a, $6
+	ld [wAudioFadeOutControl], a
+	ld a, $ff
+	ld [wNewSoundID], a
+	call PlaySound
+	callab DrawAllPokeballs
+	ld hl, ButNobodyCameText
+	call PrintText
+	jr .done
 .trainerBattle
 	call .playSFX
 	ld c, 20
@@ -94,6 +106,26 @@ GhostCantBeIDdText: ; 58e54 (16:4e54)
 	TX_FAR _GhostCantBeIDdText
 	db "@"
 
+ButNobodyCameText:
+	TX_FAR _ButNobodyCameText
+	TX_ASM
+	ld h, b
+	ld l, c
+	ld b, 3
+.loop
+	ld a, "."
+	ld [hli], a
+	ld c, 20
+	call DelayFrames
+	dec b
+	jr nz, .loop
+	ld hl, PromptText
+	ret
+	
+PromptText:
+	db $0
+	prompt
+	
 PrintSendOutMonMessage: ; 58e59 (16:4e59)
 	ld hl, wEnemyMonHP
 	ld a, [hli]
