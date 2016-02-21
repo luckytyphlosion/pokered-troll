@@ -2509,7 +2509,10 @@ wDestinationWarpID:: ; d42f
 ; if $ff, the player's coordinates are not updated when entering the map
 	ds 1
 
-	ds 128
+wInstantTextSpaceTileBuffer::
+	ds 16
+	
+	ds 112
 
 wNumSigns:: ; d4b0
 ; number of signs in the current map (up to 16)

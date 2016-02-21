@@ -5538,6 +5538,10 @@ INCLUDE "engine/trade.asm"
 INCLUDE "engine/intro.asm"
 INCLUDE "engine/trade2.asm"
 
+ITFontGraphics:
+	ds $80 * $10
+ITFontGraphicsEnd:
+
 
 SECTION "bank11",ROMX,BANK[$11]
 

@@ -3086,6 +3086,9 @@ DivideBytes:: ; 366b (0:366b)
 
 
 LoadFontTilePatterns::
+	CheckEvent EVENT_GOT_INSTANT_TEXT
+	jr nz, .instantTextFont
+.noInstantText
 	ld a, [rLCDC]
 	bit 7, a ; is the LCD enabled?
 	jr nz, .on
@@ -3100,7 +3103,29 @@ LoadFontTilePatterns::
 	ld hl, vFont
 	lb bc, BANK(FontGraphics), (FontGraphicsEnd - FontGraphics) / $8
 	jp CopyVideoDataDouble ; if LCD is on, transfer during V-blank
-
+.instantTextFont
+	ld a, [wd730]
+	bit 6, a ; is instant text disabled?
+	jr nz, .instantTextEnabled
+	ResetEvent EVENT_GOT_INSTANT_TEXT
+	jr .noInstantText
+.instantTextEnabled
+	ld a, [rLCDC]
+	bit 7, a
+	ld hl, ITFontGraphics
+	jr nz, .on2
+.off2
+	ld de, vFont
+	ld bc, $80 * $10
+	ld a, BANK(ITFontGraphics)
+	jp FarCopyData
+.on2
+	ld d, h
+	ld e, l
+	ld hl, vFont
+	lb bc, BANK(ITFontGraphics), $80
+	jp CopyVideoData
+	
 LoadTextBoxTilePatterns::
 	ld a, [rLCDC]
 	bit 7, a ; is the LCD enabled?

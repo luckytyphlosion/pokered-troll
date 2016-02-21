@@ -193,7 +193,7 @@ const_value = 0
 	const EVENT_GOT_TM11                             ; 0BE, (D75E, bit 6)
 	const EVENT_BEAT_MISTY                           ; 0BF, (D75E, bit 7)
 	const EVENT_GOT_BICYCLE                          ; 0C0, (D75F, bit 0)
-	const EVENT_0C1                                  ; 0C1, (D75F, bit 1)
+	const EVENT_GOT_INSTANT_TEXT                     ; 0C1, (D75F, bit 1)
 	const EVENT_0C2                                  ; 0C2, (D75F, bit 2)
 	const EVENT_0C3                                  ; 0C3, (D75F, bit 3)
 	const EVENT_0C4                                  ; 0C4, (D75F, bit 4)

@@ -109,20 +109,8 @@ OverworldLoopLessDelay::
 	ld a,[wEnteringCableClub]
 	and a
 	jr z,.checkForOpponent
-	dec a
-	ld a,0
-	ld [wEnteringCableClub],a
-	jr z,.changeMap
-; XXX can this code be reached?
-	predef LoadSAV
-	ld a,[wCurMap]
-	ld [wDestinationMap],a
-	call SpecialWarpIn
-	ld a,[wCurMap]
-	call SwitchToMapRomBank ; switch to the ROM bank of the current map
-	ld hl,wCurMapTileset
-	set 7,[hl]
-.changeMap
+	xor a
+	ld [wLinkTimeoutCounter],a
 	jp EnterMap
 .checkForOpponent
 	ld a,[wCurOpponent]
@@ -183,44 +171,10 @@ OverworldLoopLessDelay::
 	ld a,[wPlayerLastStopDirection] ; old direction
 	cp b
 	jr z,.noDirectionChange
-; Check whether the player did a 180-degree turn.
-; It appears that this code was supposed to show the player rotate by having
-; the player's sprite face an intermediate direction before facing the opposite
-; direction (instead of doing an instantaneous about-face), but the intermediate
-; direction is only set for a short period of time. It is unlikely for it to
-; ever be visible because DelayFrame is called at the start of OverworldLoop and
-; normally not enough cycles would be executed between then and the time the
-; direction is set for V-blank to occur while the direction is still set.
-	swap a ; put old direction in upper half
-	or b ; put new direction in lower half
-	cp a,(PLAYER_DIR_DOWN << 4) | PLAYER_DIR_UP ; change dir from down to up
-	jr nz,.notDownToUp
-	ld a,PLAYER_DIR_LEFT
-	ld [wPlayerMovingDirection],a
-	jr .holdIntermediateDirectionLoop
-.notDownToUp
-	cp a,(PLAYER_DIR_UP << 4) | PLAYER_DIR_DOWN ; change dir from up to down
-	jr nz,.notUpToDown
-	ld a,PLAYER_DIR_RIGHT
-	ld [wPlayerMovingDirection],a
-	jr .holdIntermediateDirectionLoop
-.notUpToDown
-	cp a,(PLAYER_DIR_RIGHT << 4) | PLAYER_DIR_LEFT ; change dir from right to left
-	jr nz,.notRightToLeft
-	ld a,PLAYER_DIR_DOWN
-	ld [wPlayerMovingDirection],a
-	jr .holdIntermediateDirectionLoop
-.notRightToLeft
-	cp a,(PLAYER_DIR_LEFT << 4) | PLAYER_DIR_RIGHT ; change dir from left to right
-	jr nz,.holdIntermediateDirectionLoop
-	ld a,PLAYER_DIR_UP
-	ld [wPlayerMovingDirection],a
-.holdIntermediateDirectionLoop
 	ld hl,wFlags_0xcd60
 	set 2,[hl]
-	ld hl,wCheckFor180DegreeTurn
-	dec [hl]
-	jr nz,.holdIntermediateDirectionLoop
+	xor a
+	ld [wCheckFor180DegreeTurn], a
 	ld a,[wPlayerDirection]
 	ld [wPlayerMovingDirection],a
 	call NewBattle

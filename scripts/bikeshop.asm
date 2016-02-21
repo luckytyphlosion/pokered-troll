@@ -64,7 +64,7 @@ BikeShopText1: ; 1d745 (7:5745)
 	call PrintText
 	call HandleMenuInput
 	bit 1, a
-	jr nz, .cancel
+	jr nz, .setInstantTextFlag
 	ld hl, wd730
 	res 6, [hl]
 	ld a, [wCurrentMenuItem]
@@ -77,6 +77,9 @@ BikeShopText1: ; 1d745 (7:5745)
 	call PrintText
 .Done
 	jp TextScriptEnd
+.setInstantTextFlag
+	SetEvent EVENT_GOT_INSTANT_TEXT
+	jr .cancel
 
 BikeShopMenuText: ; 1d7f8 (7:57f8)
 	db   "BICYCLE"
