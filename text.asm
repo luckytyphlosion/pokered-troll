@@ -2020,6 +2020,13 @@ _FileDataDestroyedText::
 	line "destroyed!"
 	prompt
 
+_CartridgeIsWetText::
+	text "The cartridge is"
+	line "wet! Saving would"
+	cont "would be a bad"
+	cont "idea..."
+	prompt
+
 _WouldYouLikeToSaveText::
 	text "Would you like to"
 	line "SAVE the game?"

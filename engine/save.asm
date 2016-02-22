@@ -139,6 +139,11 @@ LoadSAVIgnoreBadCheckSum: ; 73701 (1c:7701)
 
 SaveSAV: ; 7370a (1c:770a)
 	callba PrintSaveScreenText
+	CheckEvent EVENT_PREVENT_SAVING
+	jr z, .noMistyTroll
+	ld hl, CartridgeIsWetText
+	jp PrintText
+.noMistyTroll
 	ld hl,WouldYouLikeToSaveText
 	call SaveSAVConfirm
 	and a   ;|0 = Yes|1 = No|
@@ -182,6 +187,10 @@ SaveSAVConfirm: ; 73768 (1c:7768)
 	call DisplayTextBoxID ; yes/no menu
 	ld a,[wCurrentMenuItem]
 	ret
+
+CartridgeIsWetText:
+	TX_FAR _CartridgeIsWetText
+	db "@"
 
 WouldYouLikeToSaveText: ; 0x7377d
 	TX_FAR _WouldYouLikeToSaveText
@@ -346,6 +355,11 @@ ChangeBox:: ; 738a1 (1c:78a1)
 	ld a, [wCurrentMenuItem]
 	and a
 	ret nz ; return if No was chosen
+	CheckEvent EVENT_PREVENT_SAVING
+	jr z, .noMistyTroll
+	ld hl, CartridgeIsWetText
+	jp PrintText
+.noMistyTroll
 	ld hl, wCurrentBoxNum
 	bit 7, [hl] ; is it the first time player is changing the box?
 	call z, EmptyAllSRAMBoxes ; if so, empty all boxes in SRAM
