@@ -94,9 +94,27 @@ VermilionDock_1db9b: ; 1db9b (7:5b9b)
 	call VermilionDock_AnimSmokePuffDriftRight
 	ld c, $8
 .asm_1dc16
+	push de
+	ld a, [wOldSSAnneNoteValue]
+	ld e, a
+	ld a, [wChannelCommandPointers + 2]
+	cp e ; has the main note changed?
+	pop de
+	jr z, .noteNotChanged
+	ld [wOldSSAnneNoteValue], a
+	ld a, d
+	cpl
+	ld d, a
+	call VermilionDock_ComplementSmokeX
+.noteNotChanged
 	call VermilionDock_1dc7c
 	dec c
 	jr nz, .asm_1dc16
+	bit 7, d
+	jr z, .increment
+	dec d
+	dec d
+.increment
 	inc d
 	dec b
 	jr nz, .asm_1dc11
@@ -127,18 +145,42 @@ VermilionDock_AnimSmokePuffDriftRight: ; 1dc42 (7:5c42)
 	ld hl, wOAMBuffer + $11
 	ld a, [wSSAnneSmokeDriftAmount]
 	swap a
-	ld c, a
-	ld de, 4
+	ld e, a
+	ld bc, 4
 .loop
+	bit 7, d
+	jr z, .increment
+	dec [hl]
+	dec [hl]
+.increment
 	inc [hl]
-	inc [hl]
+	add hl, bc
+	dec e
+	jr nz, .loop
+	pop de
+	pop bc
+	ret
+
+VermilionDock_ComplementSmokeX:
+	push bc
+	push de
+	ld hl, wOAMBuffer + $11
+	ld de, $4
+	ld a, [wSSAnneSmokeDriftAmount]
+	swap a
+	ld c, a
+.loop
+	ld a, SCREEN_WIDTH_PIXELS + 8
+	sub [hl]
+	ld [hl], a
 	add hl, de
 	dec c
 	jr nz, .loop
 	pop de
 	pop bc
 	ret
-
+	
+	
 VermilionDock_EmitSmokePuff: ; 1dc59 (7:5c59)
 ; new smoke puff above the S.S. Anne's front smokestack
 	ld a, [wSSAnneSmokeX]

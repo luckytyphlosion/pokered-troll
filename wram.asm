@@ -971,6 +971,8 @@ wPlayerSpinWhileMovingUpOrDownAnimFrameDelay:: ; cd3f
 
 wHiddenObjectIndex:: ; cd3f
 
+wOldSSAnneNoteValue:: ; cd3f
+
 wTrainerFacingDirection:: ; cd3f
 	ds 1
 
@@ -2508,11 +2510,8 @@ wWarpEntries:: ; d3af
 wDestinationWarpID:: ; d42f
 ; if $ff, the player's coordinates are not updated when entering the map
 	ds 1
-
-wInstantTextSpaceTileBuffer::
-	ds 16
 	
-	ds 112
+	ds 128
 
 wNumSigns:: ; d4b0
 ; number of signs in the current map (up to 16)
@@ -2980,6 +2979,7 @@ wd72e:: ; d72e
 ; bit 7: set if scripted NPC movement has been initialised
 	ds 1
 
+wPreventSaving::
 	ds 1
 
 wd730:: ; d730
@@ -3051,10 +3051,14 @@ wCardKeyDoorX:: ; d740
 wFirstLockTrashCanIndex:: ; d743
 	ds 1
 
-wSecondLockTrashCanIndex:: ; d743
+wSecondLockTrashCanIndex:: ; d744
 	ds 1
 
-	ds 2
+wNumTrashCanTries:: ; d745
+	ds 1
+	
+	ds 1
+
 wEventFlags:: ; d747
 	ds 320
 

@@ -966,11 +966,22 @@ _VermilionGymTrashSuccessText2::
 	prompt
 
 _VermilionGymTrashSuccessText3::
-	text "The 2nd electric"
-	line "lock opened!"
-
-	para "The motorized door"
-	line "opened!@@"
+	text "Hey! There's a"
+	line "switch under the"
+	cont "trash!"
+	cont "Turn it on!"
+	
+	para "The 2nd electric"
+	line "lock opened!@@"
+	
+_VermilionGymTrashSuccessText4::
+	db $0
+	para "From far away,"
+	line "the opening of"
+	cont "a motorized door"
+	cont "was heard!"
+	done
+	
 
 _VermilionGymTrashFailText::
 	text "Nope! There's"
@@ -978,6 +989,21 @@ _VermilionGymTrashFailText::
 	cont "Hey! The electric"
 	cont "locks were reset!@@"
 
+_VermillionGymSecondSwitchNotInGymText::
+	text "It seems the 2nd"
+	line "switch isn't in"
+	cont "the gym's trash"
+	cont "cans..."
+	done
+
+_VermillionGymNoPointCheckingText::
+	text "None of the trash"
+	line "cans here seem to"
+	cont "be the one that"
+	cont "holds the 2nd"
+	cont "switch..."
+	done
+	
 _FoundHiddenItemText::
 	text $52, " found"
 	line "@"
@@ -2021,12 +2047,25 @@ _FileDataDestroyedText::
 	prompt
 
 _CartridgeIsWetText::
-	text "The cartridge is"
-	line "wet! Saving would"
-	cont "would be a bad"
-	cont "idea..."
+	text "The cartridge has"
+	line "been soaked with"
+	cont "water!"
+	
+	para "Saving the game"
+	line "now could result"
+	cont "in electrocution!"
 	prompt
 
+_CartridgePickedUpElectricalCharge::
+	text "The cartridge has"
+	line "picked up an"
+	cont "electric charge!"
+	
+	para "Saving the game"
+	line "now may cause a"
+	cont "short-circuit!"
+	prompt
+	
 _WouldYouLikeToSaveText::
 	text "Would you like to"
 	line "SAVE the game?"
@@ -2577,6 +2616,27 @@ _TryingToLearnText::
 	cont "for @"
 	TX_RAM wcf4b
 	text "?"
+	done
+
+_NidokingTryingToLearnCutText::
+	TX_RAM wLearnMoveMonName
+	text " is"
+	line "trying to learn"
+	cont "@"
+	TX_RAM wcf4b
+	text "!"
+
+	para "But, @"
+	TX_RAM wLearnMoveMonName
+	db $0
+	line "can't learn"
+	cont "@"
+	TX_RAM wcf4b
+	text " in"
+	cont "Generation 1!"
+	
+	para "Advance two"
+	line "generations?"
 	done
 
 _OneTwoAndText::

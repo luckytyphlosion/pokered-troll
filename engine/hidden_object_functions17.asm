@@ -312,6 +312,10 @@ VermilionGymTrashText: ; 5ddf7 (17:5df7)
 	TX_FAR _VermilionGymTrashText
 	db "@"
 
+VermillionGymNoPointCheckingText:
+	TX_FAR _VermillionGymNoPointCheckingText
+	db "@"
+
 GymTrashScript: ; 5ddfc (17:5dfc)
 	call EnableAutoTextBoxDrawing
 	ld a, [wHiddenObjectFunctionArgument]
@@ -320,8 +324,8 @@ GymTrashScript: ; 5ddfc (17:5dfc)
 ; Don't do the trash can puzzle if it's already been done.
 	CheckEvent EVENT_2ND_LOCK_OPENED
 	jr z, .ok
-
-	tx_pre_jump VermilionGymTrashText
+	tx_pre_id VermilionGymTrashText
+	jr .done
 
 .ok
 	CheckEventReuseA EVENT_1ST_LOCK_OPENED
@@ -339,76 +343,72 @@ GymTrashScript: ; 5ddfc (17:5dfc)
 .openFirstLock
 ; Next can is trying for the second switch.
 	SetEvent EVENT_1ST_LOCK_OPENED
-
-	ld hl, GymTrashCans
-	ld a, [wGymTrashCanIndex]
-	; * 5
-	ld b, a
-	add a
-	add a
-	add b
-
-	ld d, 0
-	ld e, a
-	add hl, de
-	ld a, [hli]
-
-; There is a bug in this code. It should calculate a value in the range [0, 3]
-; but if the mask and random number don't have any 1 bits in common, then
-; the result of the AND will be 0. When 1 is subtracted from that, the value
-; will become $ff. This will result in 255 being added to hl, which will cause
-; hl to point to one of the zero bytes that pad the end of the ROM bank.
-; Trash can 0 was intended to be able to have the second lock only when the
-; first lock was in trash can 1 or 3. However, due to this bug, trash can 0 can
-; have the second lock regardless of which trash can had the first lock.
-
-	ld [hGymTrashCanRandNumMask], a
-	push hl
-	call Random
-	swap a
-	ld b, a
-	ld a, [hGymTrashCanRandNumMask]
-	and b
-	dec a
-	pop hl
-
-	ld d, 0
-	ld e, a
-	add hl, de
-	ld a, [hl]
-	and $f
-	ld [wSecondLockTrashCanIndex], a
-
 	tx_pre_id VermilionGymTrashSuccessText1
+	ld hl, wNumTrashCanTries
+	inc [hl]
 	jr .done
 
 .trySecondLock
-	ld a, [wSecondLockTrashCanIndex]
-	ld b, a
-	ld a, [wGymTrashCanIndex]
-	cp b
-	jr z, .openSecondLock
-
 ; Reset the cans.
+	ld a, [wNumTrashCanTries]
+	cp $4
+	jr nc, .noPointChecking
+	
 	ResetEvent EVENT_1ST_LOCK_OPENED
 	call Random
-
+	
 	and $e
 	ld [wFirstLockTrashCanIndex], a
 
 	tx_pre_id VermilionGymTrashFailText
 	jr .done
-
-.openSecondLock
-; Completed the trash can puzzle.
-	SetEvent EVENT_2ND_LOCK_OPENED
-	ld hl, wCurrentMapScriptFlags
-	set 6, [hl]
-
-	tx_pre_id VermilionGymTrashSuccessText3
+.noPointChecking
+	tx_pre_id VermillionGymNoPointCheckingText
 
 .done
 	jp PrintPredefTextID
+	
+CeruleanHouse3TrashCan:
+; Completed the trash can puzzle.
+	ld a, [wAutoTextBoxDrawingControl]
+	push af
+	ld a, [wDoNotWaitForButtonPressAfterDisplayingText]
+	push af
+	call EnableAutoTextBoxDrawing
+	call _CeruleanHouse3TrashCan
+	pop af
+	ld [wDoNotWaitForButtonPressAfterDisplayingText], a
+	pop af
+	ld [wAutoTextBoxDrawingControl], a
+	ret
+
+_CeruleanHouse3TrashCan:
+	ld a, [wNumTrashCanTries]
+	cp $3
+	ret c
+	jr z, .onlyTrashHere
+	
+	CheckAndSetEvent EVENT_2ND_LOCK_OPENED
+	jr nz, .onlyTrashHere
+	
+	tx_pre VermilionGymTrashSuccessText3
+	
+	xor a
+	call StopMusic
+	ld c, 20
+	call DelayFrames
+	
+	ld a, $11 ; low volume
+	ld [rNR50], a
+	ld a, SFX_GO_INSIDE
+	call PlaySound
+	call WaitForSoundToFinish
+	ld a, $77
+	ld [rNR50], a
+	jp PlayDefaultMusic
+.onlyTrashHere
+	tx_pre_jump VermilionGymTrashText
+	
 
 GymTrashCans: ; 5de7d (17:5e7d)
 ; byte 0: mask for random number
@@ -460,11 +460,15 @@ VermilionGymTrashSuccesPlaySfx: ; 5dee0 (17:5ee0)
 VermilionGymTrashSuccessText3: ; 5deef (17:5eef)
 	TX_FAR _VermilionGymTrashSuccessText3
 	TX_ASM
+	ld a, SFX_SWITCH
+	call PlaySoundWaitForCurrent
 	call WaitForSoundToFinish
-	ld a, SFX_GO_INSIDE
-	call PlaySound
-	call WaitForSoundToFinish
-	jp TextScriptEnd
+	ld hl, VermilionGymTrashSuccessText4
+	ret
+	
+VermilionGymTrashSuccessText4:
+	TX_FAR _VermilionGymTrashSuccessText4
+	db "@"
 
 VermilionGymTrashFailText: ; 5df02 (17:5f02)
 	TX_FAR _VermilionGymTrashFailText
@@ -473,4 +477,14 @@ VermilionGymTrashFailText: ; 5df02 (17:5f02)
 	ld a, SFX_DENIED
 	call PlaySound
 	call WaitForSoundToFinish
+	ld a, [wNumTrashCanTries]
+	cp $3
+	jr c, .done
+	ld hl, VermillionGymSecondSwitchNotInGymText
+	call PrintText
+.done
 	jp TextScriptEnd
+
+VermillionGymSecondSwitchNotInGymText:
+	TX_FAR _VermillionGymSecondSwitchNotInGymText
+	db "@"

@@ -1,4 +1,10 @@
 VermilionGymScript: ; 5ca26 (17:4a26)
+	CheckEvent EVENT_BEAT_LT_SURGE
+	ld a, $2
+	jr z, .preventSaving
+	xor a
+.preventSaving
+	ld [wPreventSaving], a
 	ld hl, wCurrentMapScriptFlags
 	bit 5, [hl]
 	res 5, [hl]

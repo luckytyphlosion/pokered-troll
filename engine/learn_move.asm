@@ -97,7 +97,16 @@ PrintLearnedMove: ; 6efe (1:6efe)
 
 TryingToLearn: ; 6f07 (1:6f07)
 	push hl
+	ld a, [wcf91]
+	cp NIDOKING
 	ld hl, TryingToLearnText
+	jr nz, .notNidokingLearningCut
+	ld a, [wMoveNum]
+	cp CUT
+	jr nz, .notNidokingLearningCut
+; troll cut message
+	ld hl, NidokingTryingToLearnCutText
+.notNidokingLearningCut
 	call PrintText
 	coord hl, 14, 7
 	lb bc, 8, 15
@@ -182,6 +191,10 @@ TryingToLearn: ; 6f07 (1:6f07)
 .cancel
 	scf
 	ret
+
+NidokingTryingToLearnCutText:
+	TX_FAR _NidokingTryingToLearnCutText
+	db "@"
 
 LearnedMove1Text: ; 6fb4 (1:6fb4)
 	TX_FAR _LearnedMove1Text

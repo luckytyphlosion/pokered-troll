@@ -1,12 +1,14 @@
 CeruleanGymScript: ; 5c6b3 (17:46b3)
 	CheckEventHL EVENT_BEAT_MISTY
 	jr z, .doNotResetSaveEvent
-	ResetEventReuseHL EVENT_PREVENT_SAVING
+	xor a
+	ld [wPreventSaving], a
 	jr .mainScript
 .doNotResetSaveEvent
 	CheckEventReuseHL EVENT_BEAT_CERULEAN_GYM_TRAINER_0
 	jr z, .mainScript
-	SetEventReuseHL EVENT_PREVENT_SAVING
+	ld a, $1
+	ld [wPreventSaving], a
 .mainScript
 	ld hl, wCurrentMapScriptFlags
 	bit 6, [hl]

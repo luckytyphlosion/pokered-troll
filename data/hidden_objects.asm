@@ -84,6 +84,7 @@ HiddenObjectMaps: ; 46a40 (11:6a40)
 	db VERMILION_CITY
 	db CERULEAN_CITY
 	db ROUTE_4
+	db CERULEAN_HOUSE_3
 	db $FF
 
 HiddenObjectPointers: ; 46a96 (11:6a96)
@@ -173,6 +174,7 @@ HiddenObjectPointers: ; 46a96 (11:6a96)
 	dw VermilionCityHiddenObjects
 	dw CeruleanCityHiddenObjects
 	dw Route4HiddenObjects
+	dw CeruleanHouse3HiddenObjects
 
 ; format: y-coord, x-coord, text id/item id, object routine
 TradeCenterHiddenObjects: ; 46b40 (11:6b40)
@@ -850,4 +852,8 @@ CeruleanCityHiddenObjects: ; 4709d (11:709d)
 Route4HiddenObjects: ; 470a4 (11:70a4)
 	db $03,$28,GREAT_BALL
 	dbw BANK(HiddenItems),HiddenItems
+	db $FF
+CeruleanHouse3HiddenObjects:
+	db $07,$07,$00
+	dbw BANK(CeruleanHouse3TrashCan),CeruleanHouse3TrashCan
 	db $FF
