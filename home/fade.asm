@@ -7,9 +7,9 @@ LoadGBPal::
 	ld a, l
 	sub b
 	ld l, a
-	jr nc, .ok
-	dec h
-.ok
+	ld a, h
+	sbc $0
+	ld h, a
 	ld a, [hli]
 	ld [rBGP], a
 	ld a, [hli]
@@ -62,11 +62,12 @@ GBFadeDecCommon:
 	jr nz, GBFadeDecCommon
 	ret
 
+;                rBGP      rOBP0      rOBP1
+FadePal0:: db %11111111, %11010000, %11100000
 FadePal1:: db %11111111, %11111111, %11111111
 FadePal2:: db %11111110, %11111110, %11111000
 FadePal3:: db %11111001, %11100100, %11100100
 FadePal4:: db %11100100, %11010000, %11100000
-;                rBGP      rOBP0      rOBP1
 FadePal5:: db %11100100, %11010000, %11100000
 FadePal6:: db %10010000, %10000000, %10010000
 FadePal7:: db %01000000, %01000000, %01000000

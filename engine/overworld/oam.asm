@@ -14,10 +14,17 @@ PrepareOAMData:
 .updateEnabled
 	xor a
 	ld [hOAMBufferOffset], a
+	ld [hSpriteOffset2], a
+	and a
+	jr z, .playerSprite
 
 .spriteLoop
 	ld [hSpriteOffset2], a
-
+	ld a, [wMapPalOffset]
+	cp $4 * $3
+	jp z, .nextSprite
+	
+.playerSprite
 	ld d, wSpriteStateData1 / $100
 	ld a, [hSpriteOffset2]
 	ld e, a

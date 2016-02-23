@@ -439,7 +439,7 @@ WarpFound2:: ; 073c (0:073c)
 	ld [wCurMap],a
 	cp a,ROCK_TUNNEL_1
 	jr nz,.notRockTunnel
-	ld a,$06
+	ld a, $4 * $3
 	ld [wMapPalOffset],a
 	call GBFadeOutToBlack
 .notRockTunnel
