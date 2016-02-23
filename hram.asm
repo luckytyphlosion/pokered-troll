@@ -22,6 +22,8 @@ hPreviousTileset EQU $FF8B
 
 hEastWestConnectedMapWidth EQU $FF8B
 
+hWhichStopperTileMap EQU $FF8B
+
 hSlideAmount EQU $FF8B
 
 hRLEByteValue EQU $FF8B

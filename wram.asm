@@ -936,7 +936,7 @@ wPlayerSpinInPlaceAnimFrameDelayDelta:: ; cd3e
 wPlayerSpinWhileMovingUpOrDownAnimMaxY:: ; cd3e
 
 wHiddenObjectFunctionRomBank:: ; cd3e
-
+	
 wTrainerEngageDistance:: ; cd3e
 	ds 1
 
@@ -1706,6 +1706,7 @@ wPlayerDisabledMove:: ; d06d
 ; low nibble: disable turns left
 	ds 1
 
+wInescapeableBattle:: ; d06e
 	ds 1
 
 wEnemyNumAttacksLeft:: ; d06f
@@ -1723,6 +1724,7 @@ wEnemyDisabledMove:: ; d072
 ; low nibble: disable turns left
 	ds 1
 
+wGiveExperience:: ; d073
 	ds 1
 
 wPlayerNumHits:: ; d074
@@ -2865,7 +2867,12 @@ wWalkBikeSurfState:: ; d700
 ; $02 = surfing
 	ds 1
 
-	ds 10
+wRocketHideout2EncounterTrapFlags::
+	ds 2
+wRocketHideout3EncounterTrapFlags::
+	ds 1
+	
+	ds 7
 
 wTownVisitedFlag:: ; d70b
 	flag_array 13

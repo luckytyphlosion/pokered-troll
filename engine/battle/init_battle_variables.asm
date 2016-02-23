@@ -4,6 +4,8 @@ InitBattleVariables: ; 525af (14:65af)
 	xor a
 	ld [wActionResultOrTookBattleTurn], a
 	ld [wBattleResult], a
+	ld [wInescapeableBattle], a
+	ld [wGiveExperience], a
 	ld hl, wPartyAndBillsPCSavedMenuItem
 	ld [hli], a
 	ld [hli], a

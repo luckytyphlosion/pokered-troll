@@ -44,7 +44,7 @@ ItemPrices: ; 4608 (1:4608)
 	money 0     ; SECRET_KEY
 	money 0     ; XXX
 	money 0     ; BIKE_VOUCHER
-	money 950   ; X_ACCURACY
+	money 6969  ; X_ACCURACY
 	money 2100  ; LEAF_STONE
 	money 0     ; CARD_KEY
 	money 10000 ; NUGGET

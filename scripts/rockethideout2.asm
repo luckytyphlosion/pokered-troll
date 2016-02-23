@@ -1,3 +1,20 @@
+; stopper data coord stuff
+; y,  x   mon
+; 9,  2   voltorb
+; 11, 8   geodude
+; 12, 14  voltorb
+; 13, 16  koffing
+; 15, 14  voltorb
+; 16, 9   geodude
+; 18, 15  voltorb
+; 19, 2   koffing
+; 20, 6   geodude
+; 20, 11  koffing
+; 24, 9   koffing
+; 14, 25  voltorb
+
+
+
 RocketHideout2Script: ; 44e27 (11:4e27)
 	call EnableAutoTextBoxDrawing
 	ld hl, RocketHideout2TrainerHeaders
@@ -21,7 +38,11 @@ RocketHideout2Script0: ; 44e42 (11:4e42)
 	ld hl, RocketHideout2ArrowTilePlayerMovement
 	call DecodeArrowMovementRLE
 	cp $ff
-	jp z, CheckFightingMapTrainers
+	jr nz, .doSpinnerTiles
+	call RocketHideout2_StopperTileEncounter
+	ret c ; return if we got an encounter
+	jp CheckFightingMapTrainers
+.doSpinnerTiles
 	ld hl, wd736
 	set 7, [hl]
 	call StartSimulatingJoypadStates
@@ -32,6 +53,148 @@ RocketHideout2Script0: ; 44e42 (11:4e42)
 	ld a, $3
 	ld [wCurMapScript], a
 	ret
+
+RocketHideout2_StopperTileEncounter:
+	xor a
+	jr RocketHideout_StopperTileEncounterCommon
+	
+RocketHideout3_StopperTileEncounter:
+	ld a, $1
+
+RocketHideout_StopperTileEncounterCommon:
+	ld [hWhichStopperTileMap], a
+	aCoord 9, 8
+	cp $5e ; STOPPER_TILE
+	jr nz, .noEncounter
+	
+	xor a
+	call GetStopperTileEncPointer
+	
+	call ArePlayerCoordsInArray
+	jr nc, .noEncounter
+	
+	ld a, $1
+	call GetStopperTileEncPointer
+	
+	ld a, [wCoordIndex]
+	dec a
+	ld c, a
+	ld b, FLAG_TEST
+	
+	push bc
+	push hl
+	predef FlagActionPredef
+	ld a, c
+	and a
+	pop hl
+	pop bc
+	jr nz, .noEncounter ; return if encounter was triggered already
+	
+	push bc
+	ld b, FLAG_SET
+	predef FlagActionPredef
+	
+	ld a, $2
+	call GetStopperTileEncPointer
+	pop bc
+	
+	ld b, $0
+	add hl, bc
+	ld a, [hl]
+	ld [wCurOpponent], a
+	ld c, a
+	
+	cp GEODUDE
+	ld a, 21
+	jr z, .gotLevel
+	ld a, 25
+.gotLevel
+	ld [wCurEnemyLVL], a
+	
+	ld a, c
+	
+	call PlayCry
+	ld c, 10
+	call DelayFrames
+	scf
+	ret
+	
+.noEncounter
+	and a
+	ret
+	
+GetStopperTileEncPointer:
+	add a
+	add a
+	ld e, a
+	ld a, [hWhichStopperTileMap]
+	add a
+	add e
+	ld hl, RocketHideout_StopperTilesPointerTable
+	ld e, a
+	ld d, $0
+	add hl, de
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ret
+	
+RocketHideout_StopperTilesPointerTable:
+	dw RocketHideout2StopperTilesCoords
+	dw RocketHideout3StopperTilesCoords
+	
+	dw wRocketHideout2EncounterTrapFlags
+	dw wRocketHideout3EncounterTrapFlags
+	
+	dw RocketHideout2StopperTileEncounters
+	dw RocketHideout3StopperTileEncounters
+
+RocketHideout2StopperTilesCoords:
+	db 9,  2 
+	db 11, 8 
+	db 12, 14
+	db 13, 16
+	db 15, 14
+	db 16, 9 
+	db 18, 15
+	db 19, 2 
+	db 20, 6 
+	db 20, 11
+	db 24, 9 
+	db 25, 14
+	db $ff
+	
+RocketHideout3StopperTilesCoords:
+	db 11, 10
+	db 11, 16
+	db 13, 14
+	db 15, 18
+	db 16, 17
+	db 22, 15
+	db $ff
+	
+RocketHideout2StopperTileEncounters:
+	db ELECTRODE
+	db GEODUDE
+	db ELECTRODE
+	db KOFFING
+	db ELECTRODE
+	db GEODUDE
+	db ELECTRODE
+	db KOFFING
+	db GEODUDE
+	db KOFFING
+	db KOFFING
+	db ELECTRODE
+	
+RocketHideout3StopperTileEncounters:
+	db KOFFING
+	db ELECTRODE
+	db ELECTRODE
+	db GEODUDE
+	db KOFFING
+	db GEODUDE
+
 
 ;format:
 ;db y,x
@@ -307,11 +470,10 @@ RocketHideout2Script3: ; 44fc2 (11:4fc2)
 	jr nz, LoadSpinnerArrowTiles
 	xor a
 	ld [wJoyIgnore], a
+	ld [wCurMapScript], a
 	ld hl, wd736
 	res 7, [hl]
-	ld a, $0
-	ld [wCurMapScript], a
-	ret
+	jp RocketHideout2_StopperTileEncounter
 
 LoadSpinnerArrowTiles: ; 44fd7 (11:4fd7)
 	ld a, [wSpriteStateData1 + 2]

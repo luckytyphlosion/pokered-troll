@@ -36,11 +36,11 @@ CeladonMart2Text1:: ; 2476 (0:2476)
 
 ; Celadon Dept. Store 2F (2)
 CeladonMart2Text2:: ; 2482 (0:2482)
-	db $FE,9,TM_32,TM_33,TM_02,TM_07,TM_37,TM_01,TM_05,TM_09,TM_17,$FF
+	db $FE,8,TM_32,TM_33,TM_02,TM_37,TM_01,TM_05,TM_09,TM_17,TM_07,$FF
 
 ; Celadon Dept. Store 4F
 CeladonMart4Text1:: ; 248e (0:248e)
-	db $FE,5,POKE_DOLL,FIRE_STONE,THUNDER_STONE,WATER_STONE,LEAF_STONE,$FF
+	db $FE,4,FIRE_STONE,THUNDER_STONE,WATER_STONE,LEAF_STONE,POKE_DOLL,$FF
 
 ; Celadon Dept. Store 5F (1)
 CeladonMart5Text3:: ; 2496 (0:2496)

@@ -1,3 +1,12 @@
+; stopper data coord stuff
+; y,  x   mon
+; 11, 10  voltorb
+; 11, 16  koffing
+; 13, 14  voltorb
+; 15, 18  geodude
+; 16, 17  koffing
+; 22, 15  geodude
+
 RocketHideout3Script: ; 45225 (11:5225)
 	call EnableAutoTextBoxDrawing
 	ld hl, RocketHideout3TrainerHeaders
@@ -21,7 +30,11 @@ RocketHideout3Script0: ; 45240 (11:5240)
 	ld hl, RocketHideout3ArrowTilePlayerMovement
 	call DecodeArrowMovementRLE
 	cp $ff
-	jp z, CheckFightingMapTrainers
+	jr nz, .doSpinnerTiles
+	call RocketHideout3_StopperTileEncounter
+	ret c
+	jp CheckFightingMapTrainers
+.doSpinnerTiles
 	ld hl, wd736
 	set 7, [hl]
 	call StartSimulatingJoypadStates
@@ -137,11 +150,10 @@ RocketHideout3Script3: ; 452e4 (11:452e4)
 	jp nz, LoadSpinnerArrowTiles
 	xor a
 	ld [wJoyIgnore], a
+	ld [wCurMapScript], a
 	ld hl, wd736
 	res 7, [hl]
-	ld a, $0
-	ld [wCurMapScript], a
-	ret
+	jp RocketHideout3_StopperTileEncounter
 
 RocketHideout3TextPointers: ; 452fa (11:52fa)
 	dw RocketHideout3Text1

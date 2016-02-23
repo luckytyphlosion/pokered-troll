@@ -957,6 +957,9 @@ FaintEnemyPokemon: ; 0x3c567
 	call SaveScreenTilesToBuffer1
 	xor a
 	ld [wBattleResult], a
+	ld a, [wGiveExperience]
+	and a
+	ret nz ; do not give experience
 	ld b, EXP_ALL
 	call IsItemInBag
 	push af
@@ -1646,6 +1649,10 @@ TryRunningFromBattle: ; 3cab9 (f:4ab9)
 	ld a, [wIsInBattle]
 	dec a
 	jr nz, .trainerBattle ; jump if it's a trainer battle
+	ld a, [wInescapeableBattle]
+	and a
+	ld a, $0
+	jr nz, .forcedWildBattle
 	ld a, [wNumRunAttempts]
 	inc a
 	ld [wNumRunAttempts], a
@@ -1710,6 +1717,7 @@ TryRunningFromBattle: ; 3cab9 (f:4ab9)
 	                  ; plus 30 times the number of attempts, the player can escape
 ; can't escape
 	ld a, $1
+.forcedWildBattle
 	ld [wActionResultOrTookBattleTurn], a ; you lose your turn when you can't escape
 	ld hl, CantEscapeText
 	jr .printCantEscapeOrNoRunningText
@@ -7030,6 +7038,22 @@ InitWildBattle: ; 3ef8b (f:6f8b)
 	ld [wcf91], a
 	jr .spriteLoaded
 .isNoGhost
+	ld a, [wCurMap]
+	cp ROCKET_HIDEOUT_2
+	jr z, .rocketHideoutSpinnerMap
+	cp ROCKET_HIDEOUT_3
+	jr nz, .notRocketHideoutTraps
+.rocketHideoutSpinnerMap
+	ld a, [wCurOpponent]
+	cp KOFFING
+	jr nz, .notBoomKoffing
+	ld a, SELFDESTRUCT
+	ld [wEnemyMonMoves + 2], a
+.notBoomKoffing
+	ld a, $1
+	ld [wInescapeableBattle], a
+	ld [wGiveExperience], a
+.notRocketHideoutTraps
 	ld de, vFrontPic
 	call LoadMonFrontSprite ; load mon sprite
 .spriteLoaded
