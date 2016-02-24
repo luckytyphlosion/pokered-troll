@@ -2588,6 +2588,23 @@ _AbandonLearningText::
 	text "?"
 	done
 
+_UnabandonLearningText::
+	text "Abandon unlearning"
+	line "@"
+	TX_RAM wcf4b
+	text "?"
+	done
+	
+_AreYouSureText::
+	text "Are you sure?"
+	done
+	
+_BlastoiseLearnedNothingText::
+	TX_RAM wLearnMoveMonName
+	text " learned"
+	line "nothing!"
+	prompt
+	
 _DidNotLearnText::
 	TX_RAM wLearnMoveMonName
 	db $0
@@ -2639,6 +2656,32 @@ _NidokingTryingToLearnCutText::
 	line "generations?"
 	done
 
+_BlastoiseTryingToKeepCutText::
+	TX_RAM wLearnMoveMonName
+	text " is"
+	line "trying to keep"
+	cont "@"
+	TX_RAM wcf4b
+	text "!"
+	
+	para "But, @"
+	TX_RAM wLearnMoveMonName
+	db $0
+	line "can't learn"
+	cont "@"
+	TX_RAM wcf4b
+	db $0
+	cont "whatsoever!"
+	
+	para "Force @"
+	TX_RAM wLearnMoveMonName
+	db $0
+	line "to unlearn"
+	cont "@"
+	TX_RAM wcf4b
+	text "?"
+	done
+	
 _OneTwoAndText::
 	text "1, 2 and...@@"
 

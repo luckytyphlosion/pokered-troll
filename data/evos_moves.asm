@@ -272,6 +272,10 @@ Mon100_EvosMoves: ; 3b224 (e:7224)
 Mon034_EvosMoves: ; 3b233 (e:7233)
 ;NIDOKING
 ;Evolutions
+	db EV_LEVEL,36,ELECTABUZZ
+	db EV_LEVEL,36,JYNX
+	db EV_LEVEL,36,MEWTWO
+	db EV_LEVEL,36,BLASTOISE
 	db 0
 ;Learnset
 	db 8,HORN_ATTACK

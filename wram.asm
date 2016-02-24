@@ -1582,6 +1582,7 @@ wTrainerBaseMoney:: ; d046
 wMissableObjectCounter:: ; d048
 	ds 1
 
+wEvoOldSpecies2::
 	ds 1
 
 wTrainerName:: ; d04a

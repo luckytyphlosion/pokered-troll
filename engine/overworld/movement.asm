@@ -352,8 +352,6 @@ UpdateSpriteInWalkingAnimation: ; 4ffe (1:4ffe)
 	ld a, [H_CURRENTSPRITEOFFSET]
 	add $8
 	ld l, a
-	ld a, [hRandomAdd]
-	and $7f
 	ld [hl], a                       ; c2x8: set next movement delay to a random value in [0,$7f]
 	dec h                            ;       note that value 0 actually makes the delay $100 (bug?)
 	ld a, [H_CURRENTSPRITEOFFSET]
@@ -680,8 +678,17 @@ CanWalkOntoTile: ; 516e (1:516e)
 	add $8
 	ld l, a
 	call Random
+	ld a, [wCurMap]
+	cp ROUTE_16
+	push bc
+	ld b, $7f
+	jr nz, .regularBitmask
+	ld b, $1
+.regularBitmask
 	ld a, [hRandomAdd]
-	and $7f
+	and b
+	inc a
+	pop bc
 	ld [hl], a         ; c2x8: set next movement delay to a random value in [0,$7f] (again with delay $100 if value is 0)
 	scf                ; set carry (marking failure to walk)
 	ret

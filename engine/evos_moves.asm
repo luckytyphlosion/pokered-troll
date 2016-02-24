@@ -32,6 +32,7 @@ Evolution_PartyMonLoop: ; loop over party mons
 	cp $ff ; have we reached the end of the party?
 	jp z, .done
 	ld [wEvoOldSpecies], a
+	ld [wEvoOldSpecies2], a
 	push hl
 	ld a, [wWhichPokemon]
 	ld c, a
@@ -76,9 +77,17 @@ Evolution_PartyMonLoop: ; loop over party mons
 	ld a, b
 	cp EV_ITEM
 	jr z, .checkItemEvo
+	ld a, [wEvoOldSpecies2]
+	cp NIDOKING
+	jr nz, .checkForceEvolution
+	ld a, $1
+	ld [wForceEvolution], a
+	jr .skipForceEvolution
+.checkForceEvolution
 	ld a, [wForceEvolution]
 	and a
 	jr nz, Evolution_PartyMonLoop
+.skipForceEvolution
 	ld a, b
 	cp EV_LEVEL
 	jr z, .checkLevel
@@ -207,6 +216,8 @@ Evolution_PartyMonLoop: ; loop over party mons
 	ld [wd11e], a
 	xor a
 	ld [wMonDataLocation], a
+	ld a, [wEvoNewSpecies]
+	ld [wEvoOldSpecies], a
 	call LearnMoveFromLevelUp
 	pop hl
 	predef SetPartyMonTypes
@@ -321,6 +332,23 @@ LearnMoveFromLevelUp: ; 3af5b (e:6f5b)
 	ld hl, EvosMovesPointerTable
 	ld a, [wd11e] ; species
 	ld [wcf91], a
+	ld b, a
+	
+	ld a, [wEvoOldSpecies2]
+	cp NIDOKING
+	jr nz, .notNidokingToBlastoise
+	ld a, b
+	cp BLASTOISE
+	jr nz, .notNidokingToBlastoise	
+	ld a, CUT
+	ld [wd11e], a
+	call GetMoveName
+	call CopyStringToCF4B
+	ld a, $ff
+	ld [wMoveNum], a
+	jr .unlearnCut
+.notNidokingToBlastoise
+	ld a, b
 	dec a
 	ld bc, 0
 	ld hl, EvosMovesPointerTable
@@ -369,6 +397,7 @@ LearnMoveFromLevelUp: ; 3af5b (e:6f5b)
 	ld [wd11e], a
 	call GetMoveName
 	call CopyStringToCF4B
+.unlearnCut
 	predef LearnMove
 .done
 	ld a, [wcf91]

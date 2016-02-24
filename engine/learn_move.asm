@@ -37,6 +37,9 @@ DontAbandonLearning: ; 6e5b (1:6e5b)
 	pop hl
 .next
 	ld a, [wMoveNum]
+	inc a
+	jp z, .unlearnCut
+	dec a
 	ld [hl], a
 	ld bc, wPartyMon1PP - wPartyMon1Moves
 	add hl, bc
@@ -72,9 +75,57 @@ DontAbandonLearning: ; 6e5b (1:6e5b)
 	ld bc, NUM_MOVES
 	call CopyData
 	jp PrintLearnedMove
-
+.unlearnCut
+	ld hl, wPartyMon1
+	ld bc, wPartyMon2 - wPartyMon1
+	ld a, [wWhichPokemon]
+	call AddNTimes
+	push hl
+	ld bc, wPartyMon1PP - wPartyMon1
+	add hl, bc
+	ld d, h
+	ld e, l
+	pop hl
+	ld bc, wPartyMon1Moves - wPartyMon1
+	add hl, bc
+	ld c, NUM_MOVES
+.findCutLoop
+	dec c
+	jr z, .cutFourthMove
+	ld a, [hli]
+	inc de
+	cp CUT
+	jr nz, .findCutLoop
+.shiftMovesLoop
+	ld a, [hld]
+	ld [hli], a
+	inc hl
+	ld a, [de]
+	dec de
+	ld [de], a
+	inc de
+	inc de
+	dec c
+	jr nz, .shiftMovesLoop
+	dec hl
+	dec de
+.cutFourthMove
+	xor a
+	ld [de], a
+	ld [hl], a
+	
+	ld hl, BlastoiseLearnedNothingText
+	call PrintText
+	ld b, 1
+	ret
+	
 AbandonLearning: ; 6eda (1:6eda)
+	ld a, [wMoveNum]
+	inc a
 	ld hl, AbandonLearningText
+	jr nz, .notUnlearningCut
+	ld hl, UnabandonLearningText
+.notUnlearningCut
 	call PrintText
 	coord hl, 14, 7
 	lb bc, 8, 15
@@ -84,6 +135,12 @@ AbandonLearning: ; 6eda (1:6eda)
 	ld a, [wCurrentMenuItem]
 	and a
 	jp nz, DontAbandonLearning
+	ld a, [wMoveNum]
+	inc a
+	jr nz, .didNotLearn
+	ld hl, AreYouSureText
+	jr .notUnlearningCut
+.didNotLearn
 	ld hl, DidNotLearnText
 	call PrintText
 	ld b, 0
@@ -97,6 +154,10 @@ PrintLearnedMove: ; 6efe (1:6efe)
 
 TryingToLearn: ; 6f07 (1:6f07)
 	push hl
+	ld a, [wMoveNum]
+	inc a
+	ld hl, BlastoiseTryingToKeepCutText
+	jr z, .notNidokingLearningCut
 	ld a, [wcf91]
 	cp NIDOKING
 	ld hl, TryingToLearnText
@@ -117,6 +178,13 @@ TryingToLearn: ; 6f07 (1:6f07)
 	ld a, [wCurrentMenuItem]
 	rra
 	ret c
+	ld a, [wMoveNum]
+	inc a
+	jr nz, .notUnlearnCut
+	ld a, CUT
+	and a
+	ret
+.notUnlearnCut
 	ld bc, -NUM_MOVES
 	add hl, bc
 	push hl
@@ -192,6 +260,10 @@ TryingToLearn: ; 6f07 (1:6f07)
 	scf
 	ret
 
+BlastoiseTryingToKeepCutText:
+	TX_FAR _BlastoiseTryingToKeepCutText
+	db "@"
+
 NidokingTryingToLearnCutText:
 	TX_FAR _NidokingTryingToLearnCutText
 	db "@"
@@ -208,6 +280,18 @@ AbandonLearningText: ; 6fb9 (1:6fb9)
 	TX_FAR _AbandonLearningText
 	db "@"
 
+UnabandonLearningText:
+	TX_FAR _UnabandonLearningText
+	db "@"
+	
+AreYouSureText:
+	TX_FAR _AreYouSureText
+	db "@"
+
+BlastoiseLearnedNothingText:
+	TX_FAR _BlastoiseLearnedNothingText
+	db "@"
+	
 DidNotLearnText: ; 6fbe (1:6fbe)
 	TX_FAR _DidNotLearnText
 	db "@"
