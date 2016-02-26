@@ -5542,6 +5542,9 @@ ITFontGraphics:
 	ds $80 * $10
 ITFontGraphicsEnd:
 
+INCLUDE "data/baseStats/montree.asm"
+
+
 
 SECTION "bank11",ROMX,BANK[$11]
 

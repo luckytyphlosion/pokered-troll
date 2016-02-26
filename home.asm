@@ -580,6 +580,8 @@ GetMonHeader:: ; 1537 (0:1537)
 	jr z,.specialID
 	cp a,MEW
 	jr z,.mew
+	cp a,MON_TREE
+	jr z,.treeMon
 	predef IndexToPokedex   ; convert pokemon ID in [wd11e] to pokedex number
 	ld a,[wd11e]
 	dec a
@@ -598,11 +600,18 @@ GetMonHeader:: ; 1537 (0:1537)
 	inc hl
 	ld [hl],d
 	jr .done
+.treeMon
+	ld hl, TreeMonBaseStats
+	ld de, wMonHeader
+	ld bc, MonBaseStatsEnd - MonBaseStats
+	ld a, BANK(TreeMonBaseStats)
+	jr .copySpecialData
 .mew
 	ld hl,MewBaseStats
 	ld de,wMonHeader
 	ld bc,MonBaseStatsEnd - MonBaseStats
 	ld a,BANK(MewBaseStats)
+.copySpecialData
 	call FarCopyData
 .done
 	ld a,[wd0b5]
@@ -737,6 +746,10 @@ UncompressMonSprite:: ; 1627 (0:1627)
 	cp MEW
 	ld a,BANK(MewPicFront)
 	jr z,.GotBank
+	ld a,b
+	cp MON_TREE
+	ld a, BANK(MonTreePicFront)
+	jr z, .GotBank
 	ld a,b
 	cp FOSSIL_KABUTOPS
 	ld a,BANK(FossilKabutopsPic)

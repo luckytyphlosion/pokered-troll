@@ -180,7 +180,7 @@ const_value = 1
 	const CHARMELEON   ; $B2
 	const WARTORTLE    ; $B3
 	const CHARIZARD    ; $B4
-	const MISSINGNO_B5 ; $B5
+	const MON_TREE     ; $B5
 	const FOSSIL_KABUTOPS   ; $B6
 	const FOSSIL_AERODACTYL ; $B7
 	const MON_GHOST    ; $B8

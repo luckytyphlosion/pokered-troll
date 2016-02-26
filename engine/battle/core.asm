@@ -1646,6 +1646,9 @@ TryRunningFromBattle: ; 3cab9 (f:4ab9)
 	ld a, [wLinkState]
 	cp LINK_STATE_BATTLING
 	jp z, .canEscape
+	ld a, [wEnemyMonSpecies2]
+	cp MON_TREE
+	jp z, .canEscape
 	ld a, [wIsInBattle]
 	dec a
 	jr nz, .trainerBattle ; jump if it's a trainer battle
@@ -3212,6 +3215,12 @@ AnimateDodgingMon:
 	coord hl, 12, 0
 	predef_jump CopyUncompressedPicToTilemap
 	
+CheckForSelfMove:
+	ld a, [wPlayerMoveEffect]
+	ld hl, UsedOnAttackingMonEffects
+	ld de, $1
+	jp IsInArray
+	
 ExecutePlayerMove: ; 3d65e (f:565e)
 	xor a
 	ld [H_WHOSETURN], a ; set player's turn
@@ -3268,10 +3277,7 @@ PlayerCanExecuteMove: ; 3d6b0 (f:56b0)
 	ld a, [wIsInBattle]
 	dec a
 	jr nz, .notTrollGrass
-	ld a, [wPlayerMoveEffect]
-	ld hl, UsedOnAttackingMonEffects
-	ld de, $1
-	call IsInArray
+	call CheckForSelfMove
 	jr c, .notTrollGrass
 	ld c, 15
 	call DelayFrames
@@ -3279,6 +3285,23 @@ PlayerCanExecuteMove: ; 3d6b0 (f:56b0)
 	jp ExecutePlayerMoveDone
 	
 .notTrollGrass
+	ld a, [wEnemyMonSpecies2]
+	cp MON_TREE
+	jr nz, .canUseMove
+	ld a, [wPlayerMoveNum]
+	cp CUT
+	jr z, .canUseMove
+	call CheckForSelfMove
+	jr c, .canUseMove
+	ld c, 50
+	call DelayFrames
+	xor a
+	ld [wDamageMultipliers], a
+	inc a
+	ld [wMoveMissed], a
+	call PrintMoveFailureText
+	jp ExecutePlayerMoveDone
+.canUseMove
 	ld a,[wPlayerMoveEffect] ; effect of the move just used
 	ld hl,ResidualEffects1
 	ld de,1
@@ -5504,8 +5527,29 @@ AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
 	inc hl
 	jp .loop
 .done
+	ld a, [H_WHOSETURN]
+	and a
+	ret nz
+	ld a, [wEnemyMonSpecies2]
+	cp MON_TREE
+	ret nz
+	ld a, [wPlayerMoveNum]
+	cp CUT
+	ret nz
+	ld a, 20
+	ld [wDamageMultipliers], a
+	ld hl, wDamage
+	ld a, [hli]
+	ld l, [hl]
+	ld h, a
+	rl l
+	sla h
+	ld a, h
+	ld [wDamage], a
+	ld a, l
+	ld [wDamage + 1], a
 	ret
-
+	
 ; function to tell how effective the type of an enemy attack is on the player's current pokemon
 ; this doesn't take into account the effects that dual types can have
 ; (e.g. 4x weakness / resistance, weaknesses and resistances canceling)
@@ -6446,6 +6490,8 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
 	ld bc, NAME_LENGTH
 	call CopyData
 	ld a, [wEnemyMonSpecies2]
+	cp MON_TREE
+	jr z, .doNotSetFlag
 	ld [wd11e], a
 	predef IndexToPokedex
 	ld a, [wd11e]
@@ -6454,6 +6500,7 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
 	ld b, FLAG_SET
 	ld hl, wPokedexSeen
 	predef FlagActionPredef ; mark this mon as seen in the pokedex
+.doNotSetFlag
 	ld hl, wEnemyMonLevel
 	ld de, wEnemyMonUnmodifiedLevel
 	ld bc, 1 + NUM_STATS * 2

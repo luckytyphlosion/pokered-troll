@@ -116,6 +116,10 @@ ItemUseBall: ; d687 (3:5687)
 	dec a
 	jr z,.canUseBall
 
+	ld a, [wEnemyMonSpecies2]
+	cp MON_TREE
+	jp z, CannotCatchTree
+	
 	ld a,[wPartyCount] ; is party full?
 	cp a,PARTY_LENGTH
 	jr nz,.canUseBall
@@ -2378,6 +2382,10 @@ BoxFullCannotThrowBall: ; e5b1 (3:65b1)
 	ld hl,BoxFullCannotThrowBallText
 	jr ItemUseFailed
 
+CannotCatchTree:
+	ld hl, CannotCatchTreeText
+	jr ItemUseFailed
+	
 SurfingAttemptFailed: ; e5b6 (3:65b6)
 	ld hl,NoSurfingHereText
 
@@ -2418,6 +2426,10 @@ BoxFullCannotThrowBallText: ; e5e3 (3:65e3)
 	TX_FAR _BoxFullCannotThrowBallText
 	db "@"
 
+CannotCatchTreeText:
+	TX_FAR _CannotCatchTreeText
+	db "@"
+	
 ItemUseText00: ; e5e8 (3:65e8)
 	TX_FAR _ItemUseText001
 	db $05

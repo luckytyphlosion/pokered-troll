@@ -22,18 +22,51 @@ Gym4CityName: ; 48930 (12:4930)
 Gym4LeaderName: ; 4893d (12:493d)
 	db "ERIKA@"
 
+CeladonGymScriptPointers: ; 4894e (12:494e)
+	dw CheckFightingMapTrainers
+	dw DisplayEnemyTrainerTextAndStartBattle
+	dw EndTrainerBattle
+	dw CeladonGymScript3
+	dw CeladonGymScript4
+	
+CeladonGymScript4:
+	ld a, [wBattleResult]
+	and a
+	ld a, $0
+	ld [wBattleResult], a
+	jr nz, .done
+	
+	ld a, [wIsInBattle]
+	cp $ff
+	jr z, .done
+	
+	ld a, [wWhichCeladonGymTree]
+	
+	dec a
+	jr nz, .notLeftTree
+	SetEvent EVENT_CUT_CELADON_GYM_TREE_1
+	jr .wonCutTreeBattle
+.notLeftTree
+	dec a
+	jr nz, .rightTree
+; middle tree
+	SetEvent EVENT_CUT_CELADON_GYM_TREE_2
+	jr .wonCutTreeBattle
+.rightTree
+	SetEvent EVENT_CUT_CELADON_GYM_TREE_3
+.wonCutTreeBattle
+	xor a
+	ld [wWhichCeladonGymTree], a
+	callab ReplaceTreeTileBlock_AfterCeladonBattle
+	callba RedrawMapView
+.done
+; fallthrough
 CeladonGymText_48943: ; 48943 (12:4943)
 	xor a
 	ld [wJoyIgnore], a
 	ld [wCeladonGymCurScript], a
 	ld [wCurMapScript], a
 	ret
-
-CeladonGymScriptPointers: ; 4894e (12:494e)
-	dw CheckFightingMapTrainers
-	dw DisplayEnemyTrainerTextAndStartBattle
-	dw EndTrainerBattle
-	dw CeladonGymScript3
 
 CeladonGymScript3: ; 48956 (12:4956)
 	ld a, [wIsInBattle]

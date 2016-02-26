@@ -179,7 +179,7 @@ MonsterNames: ; 1c21e (7:421e)
 	db "CHARMELEON"
 	db "WARTORTLE@"
 	db "CHARIZARD@"
-	db "MISSINGNO."
+	db "TREE@@@@@@"
 	db "MISSINGNO."
 	db "MISSINGNO."
 	db "MISSINGNO."

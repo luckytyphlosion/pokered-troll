@@ -3131,6 +3131,10 @@ _BoxFullCannotThrowBallText::
 	cont "use that item!"
 	prompt
 
+_CannotCatchTreeText::
+	text "You can't catch"
+	line "a TREE!"
+	prompt
 
 SECTION "Text 11", ROMX, BANK[TEXT_11]
 
@@ -3329,6 +3333,11 @@ _UsedCutText::
 	TX_RAM wcd6d
 	text " hacked"
 	line "away with CUT!"
+	prompt
+	
+_SuddenlyTreeAttackedText::
+	text "Suddenly, the tree"
+	line "attacked!"
 	prompt
 
 

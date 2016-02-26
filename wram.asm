@@ -2902,6 +2902,7 @@ wPlayerJumpingYScreenCoordsIndex:: ; d714
 wRivalStarter:: ; d715
 	ds 1
 
+wWhichCeladonGymTree:: ; d716
 	ds 1
 
 wPlayerStarter:: ; d717

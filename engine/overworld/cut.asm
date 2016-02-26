@@ -53,6 +53,10 @@ UsedCut: ; ef54 (3:6f54)
 	res 6, [hl]
 	ld a, $ff
 	ld [wUpdateSpritesEnabled], a
+	ld a, [wCurMap]
+	cp CELADON_GYM
+	jr z, .celadonGymTrees
+.celadonGymTreesFailure
 	call InitCutAnimOAM
 	ld de, CutTreeBlockSwaps
 	call ReplaceTreeTileBlock
@@ -67,8 +71,57 @@ UsedCut: ; ef54 (3:6f54)
 	call UpdateSprites
 	jp RedrawMapView
 
+.celadonGymTrees
+	predef GetTileAndCoordsInFrontOfPlayer
+	ld b, d
+	ld c, e
+	ld hl, CeladonGymCutBushCoords
+	call CheckCoords
+	jr nc, .celadonGymTreesFailure
+	ld a, [wCoordIndex]
+	ld b, a
+	dec a
+	jr nz, .notLeftTree
+	CheckEvent EVENT_CUT_CELADON_GYM_TREE_1
+	jr nz, .celadonGymTreesFailure
+	jr .celadonGymTreesSuccess
+.notLeftTree
+	dec a
+	jr nz, .rightTree
+; middle tree
+	CheckEvent EVENT_CUT_CELADON_GYM_TREE_2
+	jr nz, .celadonGymTreesFailure
+	jr .celadonGymTreesSuccess
+.rightTree
+	CheckEvent EVENT_CUT_CELADON_GYM_TREE_3
+	jr nz, .celadonGymTreesFailure
+.celadonGymTreesSuccess
+	ld a, b
+	ld [wWhichCeladonGymTree], a
+	ld a, MON_TREE
+	ld [wCurOpponent], a
+	ld a, 30
+	ld [wCurEnemyLVL], a
+	ld a, $4
+	ld [wCeladonGymCurScript], a
+	ld a, SFX_CUT
+	call PlaySound
+	call WaitForSoundToFinish
+	ld hl, SuddenlyTreeAttackedText
+	jp PrintText
+
+CeladonGymCutBushCoords:
+	db 4, 2
+	db 7, 5
+	db 5, 7
+	db $ff
+
 UsedCutText: ; eff2 (3:6ff2)
 	TX_FAR _UsedCutText
+	db "@"
+
+SuddenlyTreeAttackedText:
+	TX_FAR _SuddenlyTreeAttackedText
 	db "@"
 
 InitCutAnimOAM: ; eff7 (3:6ff7)
@@ -172,6 +225,10 @@ BoulderDustAnimationOffsets: ; f097 (3:7097)
 	db -24, 20 ; player is facing left
 	db 40,  20 ; player is facing right
 
+	
+ReplaceTreeTileBlock_AfterCeladonBattle:
+	ld de, CutTreeBlockSwaps
+	
 ReplaceTreeTileBlock: ; f09f (3:709f)
 ; Determine the address of the tile block that contains the tile in front of the
 ; player (i.e. where the tree is) and replace it with the corresponding tile
