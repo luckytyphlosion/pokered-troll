@@ -1,5 +1,25 @@
 Mansion4Script: ; 523b9 (14:63b9)
 	call Mansion4Script_523cf
+	CheckEvent EVENT_STEPPED_ON_RATICATE_TILE
+	jr nz, .notRaticateTile
+	ld a, [wYCoord]
+	cp 26
+	jr nz, .notRaticateTile
+	ld a, [wXCoord]
+	cp 18
+	jr nz, .notRaticateTile
+; raticate tile
+; shoutouts to yellow
+	ld a, RATICATE
+	ld [wCurOpponent], a
+	ld a, 46
+	ld [wCurEnemyLVL], a
+	ld a, $1
+	ld [wInescapeableBattle], a
+	SetEvent EVENT_STEPPED_ON_RATICATE_TILE
+	ld hl, wd732
+	set 7, [hl]
+.notRaticateTile
 	call EnableAutoTextBoxDrawing
 	ld hl, Mansion4TrainerHeader0
 	ld de, Mansion4ScriptPointers

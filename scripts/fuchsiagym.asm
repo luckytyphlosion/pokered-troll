@@ -1,6 +1,7 @@
 FuchsiaGymScript: ; 7543d (1d:543d)
 	call FuchsiaGymScript_75453
 	call EnableAutoTextBoxDrawing
+	call FuchsiaGymScript_CheckIfTrainersAreAdjacentToPlayer
 	ld hl, FuchsiaGymTrainerHeaders
 	ld de, FuchsiaGymScriptPointers
 	ld a, [wFuchsiaGymCurScript]
@@ -18,6 +19,101 @@ FuchsiaGymScript_75453: ; 75453 (1d:5453)
 	call LoadGymLeaderAndCityName
 	ret
 
+FuchsiaGymScript_CheckIfTrainersAreAdjacentToPlayer:
+	ld hl, FuchsiaGym_TrainerCanSeePlayerCoords
+	call ArePlayerCoordsInArray
+	ret nc
+	ld a, [wCoordIndex]
+	dec a
+	
+	ld e, a
+	add a
+	add e
+	ld e, a
+	ld d, $0
+	
+	ld hl, FuchsiaGym_FacingOffsetsAndValues
+	add hl, de
+	
+	ld de, wSpriteStateData1 + $9
+	
+	ld a, [hl]
+	swap a
+	add e
+	ld e, a
+	jr nc, .noCarry
+	inc d
+.noCarry
+	ld a, [hli]
+	dec a
+	add a
+	
+	ld bc, wMapSpriteData
+	add c
+	ld c, a
+	jr nc, .noCarry2
+	inc b
+.noCarry2
+	ld a, [hli]
+	ld [de], a
+	ld a, [hl]
+	ld [bc], a
+	
+	call UpdateSprites
+	ld c, $2
+	jp DelayFrames
+	
+
+FuchsiaGym_TrainerCanSeePlayerCoords:
+	db 13, 6 ; 1st trainer, face left
+	db 13, 7 ; 1st trainer, face left
+	db 13, 9 ; 1st trainer, face right
+	db 12, 8 ; 1st trainer, face up
+	db 11, 8 ; 1st trainer, face up
+	
+	db 9, 7  ; 2nd trainer, face down
+	db 7, 7  ; 2nd trainer, face up
+	db 6, 7  ; 2nd trainer, face up
+	
+	db 2, 9  ; 3rd trainer, face right
+	db 1, 8  ; 3rd trainer, face up
+	
+	db 5, 2  ; 4th trainer, face left
+	db 5, 1  ; 4th trainer, face left
+	
+	db 7, 3  ; 5th trainer, face right
+	db 7, 4  ; 5th trainer, face right
+	
+	db 12, 0 ; 6th trainer, face left
+	db $ff
+	
+FuchsiaGym_FacingOffsetsAndValues:
+; format:
+; offset to sprite state data and map sprite data
+; values to replace
+
+	db $2, SPRITE_FACING_LEFT, LEFT
+	db $2, SPRITE_FACING_LEFT, LEFT
+	db $2,  SPRITE_FACING_RIGHT, RIGHT
+	db $2,  SPRITE_FACING_UP, UP
+	db $2,  SPRITE_FACING_UP, UP
+	
+	db $3,  SPRITE_FACING_DOWN, DOWN
+	db $3, SPRITE_FACING_UP, UP
+	db $3, SPRITE_FACING_UP, UP
+	
+	db $6, SPRITE_FACING_RIGHT, RIGHT
+	db $6, SPRITE_FACING_UP, UP
+	
+	db $5, SPRITE_FACING_LEFT, LEFT
+	db $5, SPRITE_FACING_LEFT, LEFT
+	
+	db $7, SPRITE_FACING_RIGHT, RIGHT
+	db $7, SPRITE_FACING_RIGHT, RIGHT
+	
+	db $4, SPRITE_FACING_LEFT, LEFT
+	
+	
 Gym5CityName: ; 75465 (1d:5465)
 	db "FUCHSIA CITY@"
 Gym5LeaderName: ; 75472 (1d:5472)

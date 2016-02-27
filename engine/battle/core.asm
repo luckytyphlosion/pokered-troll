@@ -7101,6 +7101,15 @@ InitWildBattle: ; 3ef8b (f:6f8b)
 	ld [wInescapeableBattle], a
 	ld [wGiveExperience], a
 .notRocketHideoutTraps
+	ld a, [wCurMap]
+	cp MANSION_4
+	jr nz, .notYellowRaticate
+	ld a, [wCurOpponent]
+	cp RATICATE
+	jr nz, .notYellowRaticate
+	ld a, $1
+	ld [wInescapeableBattle], a
+.notYellowRaticate
 	ld de, vFrontPic
 	call LoadMonFrontSprite ; load mon sprite
 .spriteLoaded

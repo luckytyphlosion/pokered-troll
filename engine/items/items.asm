@@ -1519,8 +1519,10 @@ ItemUseEscapeRope: ; dfaf (3:5faf)
 	and a
 	jr nz,.notUsable
 	ld a,[wCurMap]
-	cp a,AGATHAS_ROOM
-	jr z,.notUsable
+	ld hl, UndiggableMaps
+	ld de, $1
+	call IsInArray
+	jr c, .notUsable
 	ld a,[wCurMapTileset]
 	ld b,a
 	ld hl,EscapeRopeTilesets
@@ -1555,6 +1557,14 @@ ItemUseEscapeRope: ; dfaf (3:5faf)
 EscapeRopeTilesets: ; dffd (3:5ffd)
 	db FOREST, CEMETERY, CAVERN, FACILITY, INTERIOR
 	db $ff ; terminator
+
+UndiggableMaps:
+	db AGATHAS_ROOM
+	db MANSION_1
+	db MANSION_2
+	db MANSION_3
+	db MANSION_4
+	db $ff
 
 ItemUseRepel: ; e003 (3:6003)
 	ld b,100

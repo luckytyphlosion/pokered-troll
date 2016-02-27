@@ -591,6 +591,15 @@ GetMonHeader:: ; 1537 (0:1537)
 	ld de,wMonHeader
 	ld bc,MonBaseStatsEnd - MonBaseStats
 	call CopyData
+	ld hl, wd732
+	bit 7, [hl]
+	res 7, [hl]
+	jr z, .done
+; if raticate
+	ld a, RaticateYPicFront & $ff
+	ld [wMonHFrontSprite], a
+	ld a, RaticateYPicFront / $100
+	ld [wMonHFrontSprite + 1], a
 	jr .done
 .specialID
 	ld hl,wMonHSpriteDim

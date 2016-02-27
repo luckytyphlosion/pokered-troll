@@ -3012,6 +3012,7 @@ wd732:: ; d732
 ; bit 4: jumped into hole (Pokemon Mansion, Seafoam Islands, Victory Road) or went down waterfall (Seafoam Islands), so the target warp is a "dungeon warp"
 ; bit 5: currently being forced to ride bike (cycling road)
 ; bit 6: map destination is [wLastBlackoutMap] (usually the last used pokemon center, but could be the player's house)
+; bit 7: yellow raticate battle in mansion
 	ds 1
 
 wFlags_D733:: ; d733

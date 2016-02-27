@@ -5488,6 +5488,7 @@ WeepinbellPicFront::   INCBIN "pic/bmon/weepinbell.pic"
 WeepinbellPicBack::    INCBIN "pic/monback/weepinbellb.pic"
 VictreebelPicFront::   INCBIN "pic/bmon/victreebel.pic"
 VictreebelPicBack::    INCBIN "pic/monback/victreebelb.pic"
+RaticateYPicFront::    INCBIN "pic/ymon/raticate.pic"
 
 
 SECTION "Battle (bank D)", ROMX, BANK[$D]
@@ -5496,7 +5497,6 @@ INCLUDE "engine/titlescreen2.asm"
 INCLUDE "engine/battle/link_battle_versus_text.asm"
 INCLUDE "engine/slot_machine.asm"
 INCLUDE "engine/overworld/pewter_guys.asm"
-INCLUDE "engine/multiply_divide.asm"
 INCLUDE "engine/game_corner_slots.asm"
 
 
@@ -5543,6 +5543,7 @@ ITFontGraphics:
 ITFontGraphicsEnd:
 
 INCLUDE "data/baseStats/montree.asm"
+INCLUDE "engine/multiply_divide.asm"
 
 
 

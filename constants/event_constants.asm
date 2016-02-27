@@ -633,7 +633,7 @@ const_value = 0
 	const EVENT_276                                  ; 276, (D795, bit 6)
 	const EVENT_277                                  ; 277, (D795, bit 7)
 	const EVENT_MANSION_SWITCH_ON                    ; 278, (D796, bit 0)
-	const EVENT_279                                  ; 279, (D796, bit 1)
+	const EVENT_STEPPED_ON_RATICATE_TILE             ; 279, (D796, bit 1)
 	const EVENT_27A                                  ; 27A, (D796, bit 2)
 	const EVENT_27B                                  ; 27B, (D796, bit 3)
 	const EVENT_27C                                  ; 27C, (D796, bit 4)
