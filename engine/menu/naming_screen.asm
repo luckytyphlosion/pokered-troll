@@ -81,6 +81,11 @@ DisplayNameRaterScreen: ; 655c (1:655c)
 	scf
 	ret
 
+DisplayCinnabarAnswerScreen:
+	ld hl, wBuffer
+	call DisplayNamingScreen
+	jp RestoreScreenTilesAndReloadTilePatterns
+	
 DisplayNamingScreen: ; 6596 (1:6596)
 	push hl
 	ld hl, wd730
@@ -94,8 +99,7 @@ DisplayNamingScreen: ; 6596 (1:6596)
 	call LoadEDTile
 	callba LoadMonPartySpriteGfx
 	coord hl, 0, 4
-	ld b, 9
-	ld c, 18
+	lb bc, 9, 18
 	call TextBoxBorder
 	call PrintNamingText
 	ld a, 3
@@ -108,7 +112,7 @@ DisplayNamingScreen: ; 6596 (1:6596)
 	ld [wMenuWatchedKeys], a
 	ld a, 7
 	ld [wMaxMenuItem], a
-	ld a, $50
+	ld a, "@"
 	ld [wcf4b], a
 	xor a
 	ld hl, wNamingScreenSubmitName
@@ -470,6 +474,9 @@ CalcStringLength: ; 68eb (1:68eb)
 PrintNamingText: ; 68f8 (1:68f8)
 	coord hl, 0, 1
 	ld a, [wNamingScreenType]
+	cp NAME_ANSWER_SCREEN
+	ld de, AnswerTextString
+	jr z, .placeString
 	ld de, YourTextString
 	and a
 	jr z, .notNickname
@@ -510,3 +517,6 @@ NameTextString: ; 694d (1:694d)
 
 NicknameTextString: ; 6953 (1:6953)
 	db "NICKNAME?@"
+	
+AnswerTextString:
+	db "ANSWER?@"

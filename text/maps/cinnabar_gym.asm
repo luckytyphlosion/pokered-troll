@@ -96,10 +96,20 @@ _CinnabarGymText_75999::
 	line "surrender!"
 	prompt
 
-_CinnabarGymText_7599e::
+_CinnabarGymTextHint1::
 	text "I can't help"
 	line "stealing other"
 	cont "people's #MON!"
+	
+	para "I once saw a"
+	line "WEEZING on a"
+	cont "gym leader in"
+	cont "FUCHSIA CITY!"
+	
+	para "I tried stealing"
+	line "it, but its"
+	cont "DEFENSE was too"
+	cont "high!"
 	done
 
 _CinnabarGymText_759c9::
@@ -113,10 +123,14 @@ _CinnabarGymText_759ce::
 	line "My studies!"
 	prompt
 
-_CinnabarGymText_759d3::
+_CinnabarGymTextHint2::
 	text "My theories are"
 	line "too complicated"
 	cont "for you!"
+	
+	para "I've made a theory"
+	line "which involves"
+	cont "all 150 #MON!"
 	done
 
 _CinnabarGymText_759fe::
@@ -129,10 +143,14 @@ _CinnabarGymText_75a03::
 	line "to handle!"
 	prompt
 
-_CinnabarGymText_75a08::
+_CinnabarGymTextHint3::
 	text "I wish there was"
-	line "a thief #MON!"
-	cont "I'd use that!"
+	line "a thief ",$e1,$e2,"!"
+	
+	para "I'd use it to"
+	line "steal items from"
+	cont "the SHOPKEEPERS"
+	cont "in CELADON MART!"
 	done
 
 _CinnabarGymText_75a33::
@@ -144,7 +162,7 @@ _CinnabarGymText_75a38::
 	text "Ow!"
 	prompt
 
-_CinnabarGymText_75a3d::
+_CinnabarGymTextHint4::
 	text "BLAINE was lost"
 	line "in the mountains"
 	cont "when a fiery bird"
@@ -153,6 +171,15 @@ _CinnabarGymText_75a3d::
 	para "Its light enabled"
 	line "BLAINE to find"
 	cont "his way down!"
+	
+	para "It's a good thing"
+	line "the bird came"
+	cont "just in time."
+	
+	para "There were many"
+	line "GHOST-type"
+	cont "#MON on the"
+	cont "mountain."
 	done
 
 _CinnabarGymText_75a68::
@@ -166,10 +193,25 @@ _CinnabarGymText_75a6d::
 	line "Too hot!"
 	prompt
 
-_CinnabarGymText_75a72::
+_CinnabarGymTextHint5::
 	text "Us fire #MON"
 	line "fans like PONYTA"
 	cont "and NINETALES!"
+	
+	para "Whenever I go"
+	line "looking for them,"
+	cont "I always prepare"
+	cont "by buying as"
+	cont "many # BALLs"
+	cont "as I can."
+	
+	para "Sometimes, I"
+	line "forget how many"
+	cont "# BALLs I can"
+	cont "buy, so I check"
+	cont "my TRAINER CARD"
+	cont "to see how much"
+	cont "money I have."
 	done
 
 _CinnabarGymText_75a9d::
@@ -182,10 +224,25 @@ _CinnabarGymText_75aa2::
 	line "Snuffed out!"
 	prompt
 
-_CinnabarGymText_75aa7::
+_CinnabarGymTextHint6::
 	text "Water beats fire!"
 	line "But, fire melts"
 	cont "ice #MON!"
+	
+	para "If there was an"
+	line "ICE/GRASS"
+	cont "#MON, my fire"
+	cont "attacks would"
+	cont "melt and burn it"
+	cont "at the same time,"
+	cont "resulting in an"
+	cont "effective move!"
+	
+	para "TWO×TWO from both"
+	line "its weaknesses to"
+	cont "FIRE results in a"
+	cont "move 4× effective"
+	cont "than other moves!"
 	done
 
 _CinnabarGymText_75ac2::
@@ -207,4 +264,3 @@ _CinnabarGymText_75ac7::
 	text $52, "! You beat"
 	line "that fire brand!"
 	done
-

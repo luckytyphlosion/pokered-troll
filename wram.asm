@@ -2115,6 +2115,7 @@ wEvolutionOccurred:: ; d121
 wVBlankSavedROMBank:: ; d122
 	ds 1
 
+wFarCopyDataSavedROMBank:: ; d123
 	ds 1
 
 wIsKeyItem:: ; d124

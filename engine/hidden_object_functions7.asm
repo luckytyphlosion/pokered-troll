@@ -125,17 +125,17 @@ PrintCinnabarQuiz: ; 1ea17 (7:6a17)
 
 CinnabarGymQuiz: ; 1ea25 (7:6a25)
 	TX_ASM
+	call SaveScreenTilesToBuffer2
 	xor a
 	ld [wOpponentAfterWrongAnswer], a
 	ld a, [wHiddenObjectFunctionArgument]
-	push af
 	and $f
 	ld [hGymGateIndex], a
-	pop af
-	and $f0
-	swap a
-	ld [$ffdc], a
+	dec a ; first question?
 	ld hl, CinnabarGymQuizIntroText
+	jr nz, .doNotPrintIntroText
+	ld hl, CinnabarGymQuizFirstQuestionIntroText
+.doNotPrintIntroText
 	call PrintText
 	ld a, [hGymGateIndex]
 	dec a
@@ -157,6 +157,10 @@ CinnabarGymQuizIntroText: ; 1ea5b (7:6a5b)
 	TX_FAR _CinnabarGymQuizIntroText
 	db "@"
 
+CinnabarGymQuizFirstQuestionIntroText:
+	TX_FAR _CinnabarGymQuizFirstQuestionIntroText
+	db "@"
+	
 CinnabarQuizQuestions: ; 1ea60 (7:6a60)
 	dw CinnabarQuizQuestionsText1
 	dw CinnabarQuizQuestionsText2
@@ -177,29 +181,242 @@ CinnabarQuizQuestionsText3: ; 1ea76 (7:6a76)
 	TX_FAR _CinnabarQuizQuestionsText3
 	db "@"
 
-CinnabarQuizQuestionsText4: ; 1ea7b (7:6a7b)
+CinnabarQuizQuestionsText4: ; 1ea80 (7:6a80)
 	TX_FAR _CinnabarQuizQuestionsText4
 	db "@"
 
-CinnabarQuizQuestionsText5: ; 1ea80 (7:6a80)
-	TX_FAR _CinnabarQuizQuestionsText5
+CinnabarQuizQuestionsText5: ; 1ea7b (7:6a7b)
+	TX_ASM
+	ld hl, CinnabarQuizQuestion5Items
+.searchForGoodItem
+	ld a, [hli]
+	cp $ff
+	jr nz, .notNinetyNineValue
+	ld a, MASTER_BALL
+	ld [wd11e], a
+	call GetItemName
+	call CopyStringToCF4B
+	ld a, $99
+	ld [hDivideBCDQuotient + 2], a
+	jr .ninetyNineValue
+.notNinetyNineValue
+	ld [wcf91], a
+	
+	push hl
+	ld a, [wListMenuID]
+	push af
+	ld a, SPECIALLISTMENU
+	ld [wListMenuID], a
+	ld a, ItemPrices & $ff
+	ld [wItemPrices], a
+	ld a, ItemPrices / $100
+	ld [wItemPrices + 1], a
+	call GetItemPrice
+	pop af
+	ld [wListMenuID], a
+	
+	ld hl, wPlayerMoney
+	ld a, [hli]
+	ld [hMoney], a
+	ld a, [hli]
+	ld [hMoney + 1], a
+	ld a, [hl]
+	ld [hMoney + 2], a
+	
+	ld hl, hItemPrice
+	ld a, [hli]
+	ld [hDivideBCDDivisor], a
+	ld a, [hli]
+	ld [hDivideBCDDivisor + 1], a
+	ld a, [hl]
+	ld [hDivideBCDDivisor + 2], a
+	
+	predef DivideBCDPredef3
+	
+	pop hl
+	
+	ld a, [hDivideBCDQuotient]
+	and a
+	jr nz, .searchForGoodItem
+	ld a, [hDivideBCDQuotient + 1]
+	and a
+	jr nz, .searchForGoodItem
+	ld a, [hDivideBCDQuotient + 2]
+	cp $99 + $1
+	jr nc, .searchForGoodItem
+	
+	push hl
+	ld hl, MoreThan10CharacterNumbers
+	ld de, $1
+	call IsInArray
+	pop hl
+	jr c, .searchForGoodItem
+	
+	ld a, [wcf91]
+	ld [wd11e], a
+	call GetItemName
+	call CopyStringToCF4B
+.ninetyNineValue
+	ld a, [hDivideBCDQuotient + 2]
+	cp $20
+	jr c, .uniqueNumber
+; if repetitive number
+	swap a
+	and $f
+	dec a
+	ld hl, CinnabarQuizRepetitiveNumberStrings
+	call CinnabarQuiz_SearchForString
+	
+	ld hl, wcd6d
+	call CopyString
+	dec hl
+	push hl
+; now look for the lower digit
+	ld a, [hDivideBCDQuotient + 2]
+	and $f
+	jr z, .doNotPutZero
+	ld hl, CinnabarQuizUniqueNumberStrings
+	call CinnabarQuiz_SearchForString
+	pop hl
+	
+	call CopyString ; copy the rest of the number
+	jr .done
+.doNotPutZero
+	pop hl
+	jr .done
+.uniqueNumber
+	cp $10
+	jr c, .doNotAdjustBCD
+	and $f
+	add 10
+.doNotAdjustBCD
+	ld hl, CinnabarQuizUniqueNumberStrings
+	call CinnabarQuiz_SearchForString
+	
+	ld hl, wcd6d
+	call CopyString
+.done
+	xor a
+	ld [wNumMovesMinusOne], a
+	ld hl, CinnabarQuizQuestionsText5_ActualQuestion
+	call PrintText
+	jp TextScriptEnd
+
+CinnabarQuiz_SearchForString:
+	ld c, a
+	ld b, "@"
+	jr .handleLoop
+.searchForTerminatorLoop
+	ld a, [hli]
+	cp b
+	jr nz, .searchForTerminatorLoop
+.handleLoop
+	dec c
+	jr nz, .searchForTerminatorLoop
+	ld d, h
+	ld e, l
+	ret
+
+CinnabarQuizQuestionsText5_ActualQuestion:
+	TX_FAR _CinnabarQuizQuestionsText5_ActualQuestion
 	db "@"
+	
+CinnabarQuizQuestion5Items:
+	db POKE_BALL
+	db BURN_HEAL
+	db POTION
+	db LEMONADE
+	db SUPER_REPEL
+	db X_DEFEND
+	db FULL_HEAL
+	db DIRE_HIT
+	db SUPER_POTION
+	db POKE_DOLL
+	db ULTRA_BALL
+	db REVIVE
+	db WATER_STONE
+	db MAX_POTION
+	db FULL_RESTORE
+	db PROTEIN
+	db $ff
+	
+MoreThan10CharacterNumbers:
+	db $23
+	db $27
+	db $28
+	db $33
+	db $37
+	db $38
+	db $73
+	db $74
+	db $75
+	db $77
+	db $78
+	db $79
+	db $83
+	db $87
+	db $88
+	db $93
+	db $97
+	db $98
+	db $ff
+	
+CinnabarQuizUniqueNumberStrings:
+	db "ONE@"
+	db "TWO@"
+	db "THREE@"
+	db "FOUR@"
+	db "FIVE@"
+	db "SIX@"
+	db "SEVEN@"
+	db "EIGHT@"
+	db "NINE@"
+	db "TEN@"
+	db "ELEVEN@"
+	db "TWELVE@"
+	db "THIRTEEN@"
+	db "FOURTEEN@"
+	db "FIFTEEN@"
+	db "SIXTEEN@"
+	db "SEVENTEEN@"
+	db "EIGHTEEN@"
+	db "NINETEEN@"
+
+CinnabarQuizRepetitiveNumberStrings:
+	db "TWENTY@"
+	db "THIRTY@"
+	db "FORTY@"
+	db "FIFTY@"
+	db "SIXTY@"
+	db "SEVENTY@"
+	db "EIGHTY@"
+	db "NINETY@"
 
 CinnabarQuizQuestionsText6: ; 1ea85 (7:6a85)
 	TX_FAR _CinnabarQuizQuestionsText6
 	db "@"
 
+AnswerThisQuestionText:
+	TX_FAR _AnswerThisQuestionText
+	db "@"
+	
 CinnabarGymGateFlagAction: ; 1ea8a (7:6a8a)
 	EventFlagAddress hl, EVENT_CINNABAR_GYM_GATE0_UNLOCKED
 	predef_jump FlagActionPredef
 
 CinnabarGymQuiz_1ea92: ; 1ea92 (7:6a92)
+	ld hl, AnswerThisQuestionText
+	call PrintText
 	call YesNoChoice
-	ld a, [$ffdc]
-	ld c, a
 	ld a, [wCurrentMenuItem]
-	cp c
-	jr nz, .wrongAnswer
+	and a
+	ret nz ; didn't choose to answer the question
+	ld a, NAME_ANSWER_SCREEN
+	ld [wNamingScreenType], a
+	callab DisplayCinnabarAnswerScreen
+	call CinnabarGymQuiz_AdjustLowercase
+	call CinnabarGymQuiz_CheckForCorrectAnswer
+	jr nc, .wrongAnswer
 	ld hl, wCurrentMapScriptFlags
 	set 5, [hl]
 	ld a, [hGymGateIndex]
@@ -218,21 +435,103 @@ CinnabarGymQuiz_1ea92: ; 1ea92 (7:6a92)
 	call PlaySound
 	call WaitForSoundToFinish
 	ld hl, CinnabarGymQuizIncorrectText
-	call PrintText
+	jp PrintText
+
+CinnabarGymQuiz_AdjustLowercase:
+	ld hl, wBuffer
+.loop
+	ld a, [hli]
+	cp "@"
+	ret z
+	cp "a"
+	jr c, .loop
+	cp "é"
+	jr nc, .loop
+; subtract to get uppercase
+	sub $20
+	dec hl
+	ld [hli], a
+	jr .loop
+	
+CinnabarGymQuiz_CheckForCorrectAnswer:
 	ld a, [hGymGateIndex]
-	add $2
-	AdjustEventBit EVENT_BEAT_CINNABAR_GYM_TRAINER_0, 2
+	dec a
+	add a
 	ld c, a
-	ld b, FLAG_TEST
-	EventFlagAddress hl, EVENT_BEAT_CINNABAR_GYM_TRAINER_0
-	predef FlagActionPredef
-	ld a, c
+	ld b, $0
+	ld hl, CinnabarGymQuizAnswersPointerTable
+	add hl, bc
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld de, wBuffer
+.loop
+	push de
+	push hl
+	call .stringTerminatorCmp
+	pop hl
+	pop de
+	ret c ; found
+	ld a, [hl]
 	and a
-	ret nz
-	ld a, [hGymGateIndex]
-	add $2
-	ld [wOpponentAfterWrongAnswer], a
+	ret z ; not found
+	ld c, a
+	ld b, $0
+	add hl, bc ; get offset
+	jr .loop
+
+.stringTerminatorCmp
+	inc hl
+.stringTerminatorLoop
+	ld a, [de]
+	cp [hl]
+	jr nz, .stringsDifferent
+	inc hl
+	inc de
+	cp "@"
+	jr nz, .stringTerminatorLoop
+	scf
 	ret
+.stringsDifferent
+	and a
+	ret
+	
+CinnabarGymQuizAnswersPointerTable:
+	dw CinnabarGymQuizAnswer_Defense
+	dw CinnabarGymQuizAnswer_Thirteen
+	dw CinnabarGymQuizAnswer_Shopkeeper
+	dw CinnabarGymQuizAnswer_BugGhost
+	dw wNumMovesMinusOne ; CinnabarGymQuizAnswer_Money
+	dw CinnabarGymQuizAnswer_ThreeTimesNine
+	
+stringoffset: MACRO
+	db (.offsetCalc\2End - .offsetCalc\2) + 1
+.offsetCalc\2
+	db \1
+.offsetCalc\2End
+ENDM
+	
+CinnabarGymQuizAnswer_Defense:
+	db $0,"DEFENSE@"
+	
+CinnabarGymQuizAnswer_Thirteen:
+	db $0,"THIRTEEN@"
+	
+CinnabarGymQuizAnswer_Shopkeeper:
+	db $0,"SHO",$e1,"EEPERS@" ; $e1 = pk
+
+CinnabarGymQuizAnswer_BugGhost:
+	stringoffset "BUG/GHOST@", 1
+	stringoffset "BUG GHOST@", 2
+	stringoffset "BUGGHOST@",  3
+	stringoffset "GHOST/BUG@", 4
+	stringoffset "GHOST BUG@", 5
+	db $0, "GHOSTBUG@"
+
+CinnabarGymQuizAnswer_ThreeTimesNine:
+	stringoffset "THREE×NINE@", 1
+	stringoffset "NINE×THREE@", 2
+	db $0, "THREECUBED@"
 
 CinnabarGymQuizCorrectText: ; 1eae3 (7:6ae3)
 	db $0b

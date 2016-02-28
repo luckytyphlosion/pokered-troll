@@ -3391,7 +3391,9 @@ GetItemPrice:: ; 37df (0:37df)
 	ld a, [wcf91] ; a contains item id
 	cp HM_01
 	jr nc, .getTMPrice
-	ld bc, $3
+	ld c, a
+	ld b, $0
+	ld a, $3
 .asm_3802
 	add hl, bc
 	dec a

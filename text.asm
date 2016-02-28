@@ -557,57 +557,80 @@ _GameOverText::
 
 _CinnabarGymQuizIntroText::
 	text "#MON Quiz!"
+	prompt
+
+_CinnabarGymQuizFirstQuestionIntroText::
+	text "#MON Quiz!"
 
 	para "Get it right and"
 	line "the door opens to"
 	cont "the next room!"
 
 	para "Get it wrong and"
-	line "face a trainer!"
+	line "the door won't"
+	cont "open!"
 
-	para "If you want to"
-	line "conserve your"
+	para "If you're stuck on"
+	line "the answer, then"
+	cont "defeat the"
+	cont "trainer near the"
+	cont "the QUIZ machine"
+	cont "for a hint!"
+	
+	para "However,"
+	line "If you want to"
+	cont "conserve your"
 	cont "#MON for the"
 	cont "GYM LEADER..."
 
-	para "Then get it right!"
-	line "Here we go!"
+	para "Then figure it out"
+	line "yourself!"
+	
+	para "Here we go!"
 	prompt
 
 _CinnabarQuizQuestionsText1::
-	text "CATERPIE evolves"
-	line "into BUTTERFREE?"
-	done
+	text "The SOULBADGE"
+	line "raises what stat?"
+	prompt
 
 _CinnabarQuizQuestionsText2::
-	text "There are 9"
-	line "certified #MON"
-	cont "LEAGUE BADGEs?"
-	done
+	text "How many PSYCHIC"
+	line "#MON exist in"
+	cont "the KANTO region?"
+	prompt
 
 _CinnabarQuizQuestionsText3::
-	text "POLIWAG evolves 3"
-	line "times?"
-	done
+	text "Fill in the blank!"
+	
+	para "There are two"
+	line "----------"
+	cont "who sell items"
+	cont "on CELADON MART's"
+	cont "2nd floor."
+	prompt
 
 _CinnabarQuizQuestionsText4::
-	text "Are thunder moves"
-	line "effective against"
-	cont "ground element-"
-	cont "type #MON?"
-	done
+	text "What type(s)"
+	line "would be the"
+	cont "most effective"
+	cont "against a PSYCHIC"
+	cont "#MON?"
+	prompt
 
-_CinnabarQuizQuestionsText5::
-	text "#MON of the"
-	line "same kind and"
-	cont "level are not"
-	cont "identical?"
-	done
+_CinnabarQuizQuestionsText5_ActualQuestion::
+	text "How many"
+	line "@"
+	TX_RAM wcf4b
+	text "s"
+	cont "could you buy"
+	cont "at once?"
+	prompt
 
 _CinnabarQuizQuestionsText6::
-	text "TM28 contains"
-	line "TOMBSTONER?"
-	done
+	text "What is SANDSHREW's"
+	line "#DEX number?"
+	prompt
 
 _CinnabarGymQuizCorrectText::
 	text "You're absolutely"
@@ -619,6 +642,11 @@ _CinnabarGymQuizIncorrectText::
 	text "Sorry! Bad call!"
 	prompt
 
+_AnswerThisQuestionText::
+	text "Answer this"
+	line "question?"
+	done
+	
 _MagazinesText::
 	text "#MON magazines!"
 

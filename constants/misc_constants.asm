@@ -125,6 +125,7 @@ RARE_CANDY_MSG   EQU $F8
 NAME_PLAYER_SCREEN EQU 0
 NAME_RIVAL_SCREEN  EQU 1
 NAME_MON_SCREEN    EQU 2
+NAME_ANSWER_SCREEN EQU 3
 
 ; mon data locations
 ; Note that some values are not supported by all functions that use these values.
