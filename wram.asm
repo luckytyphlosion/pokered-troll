@@ -2855,7 +2855,10 @@ wRoute18GateCurScript:: ; d669
 	ds 78
 wGameProgressFlagsEnd::
 
-	ds 56
+wSaffronGymSpritePositions::
+	ds 9
+	
+	ds 47
 
 wObtainedHiddenItemsFlags::
 	ds 14
@@ -2891,7 +2894,10 @@ wFossilMon:: ; d710
 ; mon that will result from the item
 	ds 1
 
-	ds 2
+wOldWarpedFromWhichWarp::
+	ds 1
+	
+	ds 1
 
 wEnemyMonOrTrainerClass:: ; d713
 ; trainer classes start at 200

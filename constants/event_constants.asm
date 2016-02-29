@@ -873,7 +873,7 @@ const_value = 0
 	const EVENT_BEAT_SAFFRON_GYM_TRAINER_4           ; 366, (D7B3, bit 6)
 	const EVENT_BEAT_SAFFRON_GYM_TRAINER_5           ; 367, (D7B3, bit 7)
 	const EVENT_BEAT_SAFFRON_GYM_TRAINER_6           ; 368, (D7B4, bit 0)
-	const EVENT_369                                  ; 369, (D7B4, bit 1)
+	const EVENT_TALKED_TO_SABRINA_IN_CORNER          ; 369, (D7B4, bit 1)
 	const EVENT_36A                                  ; 36A, (D7B4, bit 2)
 	const EVENT_36B                                  ; 36B, (D7B4, bit 3)
 	const EVENT_36C                                  ; 36C, (D7B4, bit 4)

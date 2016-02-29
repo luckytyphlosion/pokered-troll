@@ -1,6 +1,123 @@
-_SaffronGymText_5d162::
+_SaffronGymText_SabrinaImpressed::
 	text "I had a vision of"
 	line "your arrival!"
+	
+	para "However, this"
+	line "particular"
+	cont "arrival didn't"
+	cont "happen in my"
+	cont "vision..."
+	
+	para "To see a trainer"
+	line "be able to meet"
+	cont "me in the room"
+	cont "designed for"
+	cont "me..."
+	
+	para "That is the true"
+	line "meaning of a"
+	cont "strong trainer."
+	
+	para "One who uses their"
+	line "brain well will"
+	cont "do good in"
+	cont "battle."
+	
+	para "I dislike fight-"
+	line "ing, and you have"
+	cont "already impressed"
+	cont "me well, so I"
+	cont "shall give you"
+	cont "the MARSHBADGE!@"
+	db $0b, "@"
+	
+_SaffronGymText_SabrinaCornerphobic::
+	text "I had a vision of"
+	line "your arrival!"
+	
+	para "I have had psychic"
+	line "powers since I"
+	cont "was a child."
+
+	para "I first learned"
+	line "to bend spoons"
+	cont "with my mind."
+
+	para "I dislike fight-"
+	line "ing, but if you"
+	cont "wish, I will show"
+	cont "you my powers!"
+	
+	para "..."
+	
+	para "..."
+	
+	para "..."
+	
+	para "...I'm sorry."
+	
+	para "I'd prefer to not"
+	line "fight in the"
+	cont "corner of the"
+	cont "gym."
+	
+	para "I'll see you in"
+	line "another room,"
+	cont "where I will"
+	cont "accept your"
+	cont "challenge."
+	
+	para "If you haven't"
+	line "figured the"
+	cont "puzzle out, I'll"
+	cont "explain it to"
+	cont "you."
+	prompt
+
+_SaffronGymText_PuzzleExplanation::
+	text "Every time you"
+	line "teleport, every"
+	cont "person moves in"
+	cont "gym equivalent"
+	cont "to the amount of"
+	cont "teleporter tiles"
+	cont "you have passed."
+	
+	para "For example, at"
+	line "the start of the"
+	cont "gym, you passed"
+	cont "by 2 teleporters"
+	cont "going right, and"
+	cont "one teleporter"
+	cont "going down, so"
+	cont "the trainers"
+	cont "move two rooms"
+	cont "right and one"
+	cont "down."
+	
+	para "Simple, right?"
+	
+	para "Well, I'll be"
+	line "seeing you."
+	done
+	
+_SaffronGymText_ListenAgain::
+	text "Care to hear my"
+	line "explanation"
+	cont "again?@@"
+	
+_SaffronGymText_AfterMeetingSabrinaInCornerRoom::
+	text "Well, I'll be"
+	line "seeing you."
+	done
+
+_SaffronGymText_5d162::
+	text "Well, now that"
+	line "we're in a non-"
+	cont "corner part of"
+	cont "the gym, I'll"
+	cont "explain a bit"
+	cont "about myself."
 
 	para "I have had psychic"
 	line "powers since I"

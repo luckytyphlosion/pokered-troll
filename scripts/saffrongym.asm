@@ -2,7 +2,7 @@ SaffronGymScript: ; 5d00d (17:500d)
 	ld hl, wCurrentMapScriptFlags
 	bit 6, [hl]
 	res 6, [hl]
-	call nz, .extra
+	call nz, SaffronGymScript_UponMapEntry
 	call EnableAutoTextBoxDrawing
 	ld hl, SaffronGymTrainerHeader0
 	ld de, SaffronGymScriptPointers
@@ -11,10 +11,252 @@ SaffronGymScript: ; 5d00d (17:500d)
 	ld [wSaffronGymCurScript], a
 	ret
 
-.extra
+SaffronGymScript_UponMapEntry:
 	ld hl, Gym6CityName
 	ld de, Gym6LeaderName
-	jp LoadGymLeaderAndCityName
+	call LoadGymLeaderAndCityName
+; first time entering the map
+	ld a, [wWarpedFromWhichMap]
+	cp SAFFRON_CITY
+	jp z, SaffronGymScript_InitializeSpritePositions
+; get current "position" of warp strictly
+	ld a, [wWarpedFromWhichWarp]
+	ld b, a
+	ld a, [wDestinationWarpID]
+	dec a
+	dec a
+	add a
+	ld e, a
+	ld d, $0
+	ld hl, SaffronGymWarpOnlyCoords
+	add hl, de
+	ld a, [hli]
+	ld d, a
+	ld e, [hl]
+; get position of last warp
+	ld a, b
+	dec a
+	dec a
+	add a
+	ld c, a
+	ld b, $0
+	ld hl, SaffronGymWarpOnlyCoords
+	add hl, bc	
+	ld a, [hli]
+	ld b, a
+	ld c, [hl]
+; new coords = de
+; old coords = bc
+; calculate offsets
+	ld a, b ; subtract old - new
+	sub d
+	jr nc, .up
+	cpl
+	inc a
+	call SaffronGymWarps_ModBy3
+	call SaffronGymWarps_ModifyToUpOrLeft
+	jr .checkLeftOrRight
+.up
+	call SaffronGymWarps_ModBy3
+.checkLeftOrRight
+	ld b, a
+	
+	ld a, c
+	sub e
+	jr nc, .left
+	cpl
+	inc a
+	call SaffronGymWarps_ModBy3
+	call SaffronGymWarps_ModifyToUpOrLeft
+	jr .shiftSprites
+.left
+	call SaffronGymWarps_ModBy3
+.shiftSprites
+	ld c, a
+	
+; b = y coord offset
+; c = x coord offset
+	call SaffronGymWarps_ShiftY
+	call SaffronGymWarps_ShiftX
+	call SaffronGymWarps_UpdateSpritePositions
+	call UpdateSprites
+	ld c, 2
+	jp DelayFrames
+	
+	
+SaffronGymWarps_ShiftY:
+	ld a, b
+	and a
+	ret z
+.shiftYLoop
+	push bc
+	
+	ld hl, wSaffronGymSpritePositions
+	ld a, [hli]
+	ld b, a
+	ld a, [hli]
+	ld c, a
+	ld a, [hl]
+	push bc
+	push af ; save first row on stack
+	
+	ld hl, wSaffronGymSpritePositions + 3
+	ld de, wSaffronGymSpritePositions
+	ld bc, $6
+	
+	call CopyData ; shift upwards
+
+; move stuff from top row to bottom	
+	pop af
+	ld hl, wSaffronGymSpritePositions + 8
+	ld [hld], a
+	pop bc
+	ld a, c
+	ld [hld], a
+	ld [hl], b
+	pop bc
+	dec b
+	jr nz, .shiftYLoop
+	ret
+	
+SaffronGymWarps_ShiftX:
+	ld a, c
+	and a
+	ret z
+.outerLoop
+	ld hl, wSaffronGymSpritePositions
+	ld b, $3
+.innerLoop
+	ld a, [hli]
+	push af ; save first column
+	ld a, [hld]
+	ld [hli], a
+	inc hl ; hl = third column
+	ld a, [hld]
+	ld [hli], a ; hl = third column after increment
+	pop af ; restore first column sprite
+	ld [hli], a ; write first to third
+	dec b
+	jr nz, .innerLoop
+	dec c
+	jr nz, .outerLoop
+	ret
+	
+SaffronGymWarps_ModBy3:
+	ld d, 3
+.loop
+	sub d
+	jr nc, .loop
+	add d
+	ret
+	
+SaffronGymWarps_ModifyToUpOrLeft:
+	and a
+	ret z ; no movement
+	dec a
+	ld a, $2
+	ret z ; one movement in direction X = two in the opposite direction
+; reverse above comment
+	dec a ; get one
+	ret
+	
+SaffronGymWarps_UpdateSpritePositions:
+	ld a, 9
+	ld de, wSaffronGymSpritePositions
+	ld hl, SaffronGymScript_SpriteCoordinates
+.loop
+	push af
+	ld a, [hli]
+	ld b, a
+	ld a, [hli]
+	ld c, a
+	push hl
+	ld hl, wSpriteStateData2 + $14
+	ld a, [de]
+	inc de
+	dec a
+	swap a
+	add l
+	ld l, a
+	jr nc, .noCarry ; this should never be a problem but coding practices...
+	inc h
+.noCarry
+	ld a, b
+	ld [hli], a
+	ld [hl], c
+	pop hl
+	pop af
+	dec a
+	jr nz, .loop
+	ret
+
+SaffronGymScript_SpriteCoordinates:
+; hardcode the table instead of shifting around data
+spritedatacoords: MACRO
+	db \2 + 4, \1 + 4
+ENDM
+
+	spritedatacoords $3, $1
+	spritedatacoords $a, $1
+	spritedatacoords $11, $1
+	spritedatacoords $3, $7
+	spritedatacoords $9, $8
+	spritedatacoords $11, $7
+	spritedatacoords $3, $d
+	spritedatacoords $a, $f
+	spritedatacoords $11, $d
+	
+SaffronGymScript_InitializeSpritePositions:
+	xor a
+	ld [wOldWarpedFromWhichWarp], a
+	ld hl, SaffronGym_InitialSpritePositions
+	ld de, wSaffronGymSpritePositions
+	ld bc, SaffronGym_InitialSpritePositionsEnd - SaffronGym_InitialSpritePositions
+	jp CopyData
+
+SaffronGym_InitialSpritePositions:
+	db 8, 2, 3
+	db 4, 1, 5
+	db 6, 9, 7
+SaffronGym_InitialSpritePositionsEnd:
+	
+SaffronGymWarpOnlyCoords:
+; FORMAT: y, x
+	db 0, 0
+	db 0, 1
+	db 1, 0
+	db 1, 1
+	db 2, 0
+	db 2, 1
+	db 3, 0
+	db 3, 1
+	db 4, 0
+	db 4, 1
+	db 5, 0
+	db 5, 1
+	
+	db 0, 2
+	db 0, 3
+	db 1, 2
+	db 1, 3
+	db 3, 3
+	db 4, 3
+	
+	db 0, 4
+	db 0, 5
+	db 1, 4
+	db 1, 5
+	db 2, 4
+	db 2, 5
+	db 3, 4
+	db 3, 5
+	db 4, 4
+	db 4, 5
+	db 5, 4
+	db 5, 5
+	
+; trainer indexes in order:
+
 
 Gym6CityName: ; 5d033 (17:5033)
 	db "SAFFRON CITY@"
@@ -156,14 +398,51 @@ SaffronGymText1: ; 5d118 (17:5118)
 	jr z, .asm_5d134
 	CheckEventReuseA EVENT_GOT_TM46
 	jr nz, .asm_5d12c
+.giveBadgeAndTM
 	call z, SaffronGymText_5d068
 	call DisableWaitingAfterTextDisplay
-	jr .asm_5d15f
+	jp .asm_5d15f
 .asm_5d12c
 	ld hl, SaffronGymText_5d16e
 	call PrintText
-	jr .asm_5d15f
+	jp .asm_5d15f
 .asm_5d134
+	ld a, [wSpriteStateData2 + $14]
+	ld b, a
+	ld a, [wSpriteStateData2 + $15]
+	ld c, a
+	ld hl, SaffronGymCornerAndCentreCoords
+	call CheckCoords
+	jr nc, .regularText
+	ld a, [wCoordIndex]
+	dec a
+	jr nz, .notSabrinaImpressedText
+	ld hl, SaffronGymText_SabrinaImpressed
+	call PrintText
+	call WaitForSoundToFinish
+	xor a
+	jr .giveBadgeAndTM
+.notSabrinaImpressedText
+	CheckAndSetEvent EVENT_TALKED_TO_SABRINA_IN_CORNER
+	jr nz, .subsequentMeets
+	ld hl, SaffronGymText_SabrinaCornerphobic
+	call PrintText
+	ld hl, SaffronGymText_PuzzleExplanation
+	call PrintText
+	jp TextScriptEnd
+.subsequentMeets
+	ld hl, SaffronGymText_ListenAgain
+	call PrintText
+	call YesNoChoice
+	ld a, [wCurrentMenuItem]
+	and a
+	ld hl, SaffronGymText_PuzzleExplanation
+	jr z, .gotText
+	ld hl, SaffronGymText_AfterMeetingSabrinaInCornerRoom
+.gotText
+	call PrintText
+	jp TextScriptEnd
+.regularText
 	ld hl, SaffronGymText_5d162
 	call PrintText
 	ld hl, wd72d
@@ -182,6 +461,36 @@ SaffronGymText1: ; 5d118 (17:5118)
 	ld [wSaffronGymCurScript], a
 .asm_5d15f
 	jp TextScriptEnd
+	
+SaffronGymText_SabrinaImpressed:
+	TX_FAR _SaffronGymText_SabrinaImpressed
+	db "@"
+	
+SaffronGymText_SabrinaCornerphobic:
+	TX_FAR _SaffronGymText_SabrinaCornerphobic
+	db "@"
+
+SaffronGymText_ListenAgain:
+	TX_FAR _SaffronGymText_ListenAgain
+	db "@"
+	
+SaffronGymText_PuzzleExplanation:
+	TX_FAR _SaffronGymText_PuzzleExplanation
+	db "@"
+
+SaffronGymText_AfterMeetingSabrinaInCornerRoom:
+	TX_FAR _SaffronGymText_AfterMeetingSabrinaInCornerRoom
+	db "@"
+
+SaffronGymCornerAndCentreCoords:
+; middle
+	spritedatacoords $9, $8
+; four corners
+	spritedatacoords $3, $1
+	spritedatacoords $11, $1
+	spritedatacoords $3, $d
+	spritedatacoords $11, $d
+	db $ff
 
 SaffronGymText_5d162: ; 5d162 (17:5162)
 	TX_FAR _SaffronGymText_5d162
