@@ -7027,7 +7027,13 @@ InitBattleCommon: ; 3ef3d (f:6f3d)
 	ld a, [wEnemyMonSpecies2]
 	sub 200
 	jp c, InitWildBattle
+; init trainer battle
 	ld [wTrainerClass], a
+	CheckEvent EVENT_RHYHORN_COOLTRAINER_REMATCHED
+	jr z, .notRhyhornCooltrainer
+	ld a, $1
+	ld [wGiveExperience], a
+.notRhyhornCooltrainer
 	call GetTrainerInformation
 	callab ReadTrainer
 	call DoBattleTransitionAndInitBattleVariables

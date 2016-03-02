@@ -28,8 +28,22 @@ ViridianGymScriptPointers: ; 748e1 (1d:48e1)
 	dw EndTrainerBattle
 	dw ViridianGymScript3
 	dw ViridianGymScript4
+	dw ViridianGymScript5
+	dw ViridianGymScript6
 
 ViridianGymScript0: ; 748eb (1d:48eb)
+	ld hl, wCurrentMapScriptFlags
+	bit 6, [hl]
+	res 6, [hl]
+	jr z, .notRhyhornCooltrainerRematch
+	CheckEvent EVENT_RHYHORN_COOLTRAINER_REMATCHED
+	jr z, .notRhyhornCooltrainerRematch
+	CheckEvent EVENT_BEAT_RHYHORN_COOLTRAINER_AGAIN
+	jr nz, .notRhyhornCooltrainerRematch
+	SetEvent EVENT_DO_RHYHORN_COOLTRAINER_ALT_TEXT
+	call UpdateSprites
+	jr .doRhyhornCooltrainerRematch
+.notRhyhornCooltrainerRematch
 	ld a, [wYCoord]
 	ld b, a
 	ld a, [wXCoord]
@@ -37,7 +51,56 @@ ViridianGymScript0: ; 748eb (1d:48eb)
 	ld hl, ViridianGymArrowTilePlayerMovement
 	call DecodeArrowMovementRLE
 	cp $ff
-	jp z, CheckFightingMapTrainers
+	jp nz, .simulateJoypadStates
+	ld a, [wYCoord]
+	cp 5
+	jr nz, .checkFightingMapTrainers
+	ld a, [wXCoord]
+	cp 11
+	jr nz, .checkFightingMapTrainers
+	CheckEvent EVENT_BEAT_VIRIDIAN_GYM_TRAINER_5
+	jr z, .checkFightingMapTrainers
+	CheckEvent EVENT_BEAT_VIRIDIAN_GYM_TRAINER_4
+	jr z, .checkFightingMapTrainers
+	CheckEvent EVENT_BEAT_RHYHORN_COOLTRAINER_AGAIN
+	jr z, .rhyhornCooltrainerRematch
+.checkFightingMapTrainers
+	jp CheckFightingMapTrainers
+; make cooltrainer snipe the trainer, effectively trapping them and forcing a wipe
+.rhyhornCooltrainerRematch 
+	ld a, SPRITE_FACING_LEFT
+	ld [wSpriteStateData1 + $69], a ; lol69
+	ld a, LEFT
+	ld [wMapSpriteData + 5 * 2], a
+	SetEvent EVENT_RHYHORN_COOLTRAINER_REMATCHED
+	call UpdateSprites
+	callab SaveSAVtoSRAM ; no savescumming
+.doRhyhornCooltrainerRematch
+	ld a, $6
+	ld [wSpriteIndex], a
+	ld hl, wFlags_D733
+	set 3, [hl]
+	call EngageMapTrainer
+	ld a, [wSpriteIndex]
+	ld [wEmotionBubbleSpriteIndex], a
+	xor a ; EXCLAMATION_BUBBLE
+	ld [wWhichEmotionBubble], a
+	predef EmotionBubble
+	ld a, D_RIGHT | D_LEFT | D_UP | D_DOWN
+	ld [wJoyIgnore], a
+	xor a
+	ld [hJoyHeld], a
+	ld a, SPRITE_FACING_LEFT
+	ld [wTrainerFacingDirection], a
+	call TrainerWalkUpToPlayer_Bank0
+	ld hl, ViridianGymEndBattleText5
+	ld de, ViridianGymAfterBattleText5
+	call SaveEndBattleTextPointers
+	ld a, $5
+	ld [wCurMapScript], a
+	ret
+	
+.simulateJoypadStates
 	call StartSimulatingJoypadStates
 	ld hl, wd736
 	set 7, [hl]
@@ -49,6 +112,44 @@ ViridianGymScript0: ; 748eb (1d:48eb)
 	ld [wCurMapScript], a
 	ret
 
+ViridianGymScript5:
+	ld a, [wd730]
+	bit 0, a
+	ret nz
+	xor a
+	ld [wJoyIgnore], a
+	ld a, 15
+	ld [hSpriteIndexOrTextID], a
+	call DisplayTextID
+ViridianGymScript_StartRhyhornGymBattle:
+	call StartTrainerBattle
+	ld a, $6
+	ld [wCurMapScript], a
+	ld [wSpriteIndex], a
+	ld [hSpriteIndexOrTextID], a
+	ret
+	
+ViridianGymScript6:
+	ld a, [wIsInBattle]
+	cp $ff
+	jr nz, .wonBattle
+	SetEvent EVENT_BEAT_RHYHORN_COOLTRAINER_AGAIN
+	ResetEvent EVENT_RHYHORN_COOLTRAINER_REMATCHED
+	jp ViridianGymScript_748d6
+.wonBattle
+	ld a, $f0
+	ld [wJoyIgnore], a
+	ld hl, ViridianGymEndBattleText5
+	ld de, ViridianGymAfterBattleText5
+	call SaveEndBattleTextPointers
+	ld a, 16
+	ld [hSpriteIndexOrTextID], a
+	call DisplayTextID
+	ld a, $6
+	ld [wSpriteIndex], a
+	call EngageMapTrainer
+	jr ViridianGymScript_StartRhyhornGymBattle
+	
 ;format:
 ;db y,x
 ;dw pointer to movement
@@ -183,6 +284,8 @@ ViridianGymTextPointers: ; 749ec (1d:49ec)
 	dw ViridianGymText12
 	dw ViridianGymText13
 	dw ViridianGymText14
+	dw ViridianGymBattleText_RhyhornCooltrainerRematch
+	dw ViridianGymBattleText_RhyhornCooltrainerLost
 
 ViridianGymTrainerHeaders: ; 74a08 (1d:4a08)
 ViridianGymTrainerHeader0: ; 74a08 (1d:4a08)
@@ -223,7 +326,7 @@ ViridianGymTrainerHeader3: ; 74a2c (1d:4a2c)
 
 ViridianGymTrainerHeader4: ; 74a38 (1d:4a38)
 	dbEventFlagBit EVENT_BEAT_VIRIDIAN_GYM_TRAINER_4
-	db ($3 << 4) ; trainer's view range
+	db ($4 << 4) ; trainer's view range
 	dwEventFlagAddress EVENT_BEAT_VIRIDIAN_GYM_TRAINER_4
 	dw ViridianGymBattleText5 ; TextBeforeBattle
 	dw ViridianGymAfterBattleText5 ; TextAfterBattle
@@ -391,6 +494,28 @@ ViridianGymText5: ; 74b3e (1d:4b3e)
 
 ViridianGymBattleText4: ; 74b48 (1d:4b48)
 	TX_FAR _ViridianGymBattleText4
+	db "@"
+
+ViridianGymBattleText_RhyhornCooltrainerRematch:
+	TX_ASM
+	CheckEvent EVENT_DO_RHYHORN_COOLTRAINER_ALT_TEXT
+	ld hl, ViridianGymBattleText_RematchRegularText
+	jr z, .gotText
+	ld hl, ViridianGymBattleText_RematchAltText
+.gotText
+	call PrintText
+	jp TextScriptEnd
+	
+ViridianGymBattleText_RematchRegularText:
+	TX_FAR _ViridianGymBattleText_RematchRegularText
+	db "@"
+
+ViridianGymBattleText_RematchAltText:
+	TX_FAR _ViridianGymBattleText_RematchAltText
+	db "@"
+
+ViridianGymBattleText_RhyhornCooltrainerLost:
+	TX_FAR _ViridianGymBattleText_RhyhornCooltrainerLost
 	db "@"
 
 ViridianGymEndBattleText4: ; 74b4d (1d:4b4d)

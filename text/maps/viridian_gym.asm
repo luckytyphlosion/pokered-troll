@@ -160,6 +160,38 @@ _ViridianGymAfterBattleText5::
 	line "scold me!"
 	done
 
+_ViridianGymBattleText_RematchRegularText::
+	text "I refuse to lose!"
+	
+	para "I want a rematch!"
+	done
+	
+_ViridianGymBattleText_RematchAltText::
+	text "Resetting won't get"
+	line "get you anywhere!"
+	
+	para "I'll have my"
+	line "rematch, and I'll"
+	cont "win for sure!"
+	done
+	
+_ViridianGymBattleText_RhyhornCooltrainerLost::
+	text "Argh! I lost"
+	line "again!"
+	
+	para "This isn't over!"
+	line "I'll keep fighting"
+	cont "you until I win!"
+	
+	para "Hahahaha!"
+	
+	para "Hahahahaha!"
+	
+	para "HahahahahahahahahahahahasanshahahahahasadfasdfiuwweOKjfk09gweIDFx 42069 ERROR"
+	
+	para "Let's go!"
+	done
+	
 _ViridianGymBattleText6::
 	text "I'm the KARATE"
 	line "KING! Your fate"
