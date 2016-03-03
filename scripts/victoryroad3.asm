@@ -39,6 +39,7 @@ VictoryRoad3Script0: ; 449b7 (11:49b7)
 	ld hl, wCurrentMapScriptFlags
 	set 5, [hl]
 	SetEvent EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH1
+	SetEvent EVENT_SHOW_ROUTE_23_STATUE_4
 	ret
 .asm_449dc
 	CheckAndSetEvent EVENT_VICTORY_ROAD_3_BOULDER_ON_SWITCH2

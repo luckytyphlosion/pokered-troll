@@ -488,3 +488,26 @@ VermilionGymTrashFailText: ; 5df02 (17:5f02)
 VermillionGymSecondSwitchNotInGymText:
 	TX_FAR _VermillionGymSecondSwitchNotInGymText
 	db "@"
+
+Route23HelixOrDomeFossilText:
+	CheckEvent EVENT_GOT_DOME_FOSSIL
+	tx_pre_id HelixDisapprovesText
+	jr nz, .gotFossil
+	CheckEvent EVENT_GOT_HELIX_FOSSIL
+	tx_pre_id DomeDisapprovesText
+	jr nz, .gotFossil
+	tx_pre_id BothHelixAndDomeDisapproveText
+.gotFossil
+	jp PrintPredefTextID
+	
+DomeDisapprovesText:
+	TX_FAR _DomeDisapprovesText
+	db "@"
+
+HelixDisapprovesText:
+	TX_FAR _HelixDisapprovesText
+	db "@"
+	
+BothHelixAndDomeDisapproveText:
+	TX_FAR _BothHelixAndDomeDisapproveText
+	db "@"

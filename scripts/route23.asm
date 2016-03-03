@@ -17,8 +17,28 @@ Route23Script_511e9: ; 511e9 (14:51e9)
 	predef ShowObject
 	ld a, HS_VICTORY_ROAD_2_BOULDER
 	ld [wMissableObjectIndex], a
-	predef_jump HideObject
-
+	predef HideObject
+	
+	EventFlagAddress hl, EVENT_SHOW_ROUTE_23_STATUE_1
+	ld e, [hl]
+	ld d, $4
+	lb bc, 15, 9
+.loop
+	srl e
+	jr c, .doNotShowHelixFossils
+	push bc
+	push de
+	ld a, $2 ; helix fossil blocks
+	ld [wNewTileBlockID], a
+	predef ReplaceTileBlock
+	pop de
+	pop bc
+.doNotShowHelixFossils
+	dec b
+	dec d
+	jr nz, .loop
+	ret
+	
 Route23ScriptPointers: ; 51213 (14:5213)
 	dw Route23Script0
 	dw Route23Script1

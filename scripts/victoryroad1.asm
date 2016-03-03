@@ -32,6 +32,7 @@ VictoryRoad1Script0: ; 5da40 (17:5a40)
 	ld hl, wCurrentMapScriptFlags
 	set 5, [hl]
 	SetEvent EVENT_VICTORY_ROAD_1_BOULDER_ON_SWITCH
+	SetEvent EVENT_SHOW_ROUTE_23_STATUE_1
 	ret
 
 CoordsData_5da5c: ; 5da5c (17:5a5c)

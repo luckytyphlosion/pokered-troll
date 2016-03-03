@@ -2433,7 +2433,31 @@ GetTileTwoStepsInFrontOfPlayer: ; c5be (3:45be)
 	ld [wTileInFrontOfPlayer], a
 	ret
 
+CheckForVictoryRoadMap:
+	ld a, [wCurMap]
+	cp VICTORY_ROAD_1
+	jr z, .success
+	cp VICTORY_ROAD_2
+	jr z, .success
+	cp VICTORY_ROAD_3
+	jr nz, .failure
+.success
+	scf
+	ret
+.failure
+	and a
+	ret
+	
 CheckForCollisionWhenPushingBoulder: ; c60b (3:460b)
+	call CheckForVictoryRoadMap
+	jr nc, .notVictoryRoad
+	aCoord 8, 9
+	cp $15
+	ld a, $fe
+	jr z, .done ; if we're pushing towards the stairs, push the boulder normally
+	xor a
+	jr .done
+.notVictoryRoad
 	call GetTileTwoStepsInFrontOfPlayer
 	ld hl, wTileSetCollisionPtr
 	ld a, [hli]
@@ -2458,6 +2482,12 @@ CheckForCollisionWhenPushingBoulder: ; c60b (3:460b)
 	ld [wTileInFrontOfBoulderAndBoulderCollisionResult], a
 	ret
 
+VictoryRoadMaps:
+	db VICTORY_ROAD_1
+	db VICTORY_ROAD_2
+	db VICTORY_ROAD_3
+	db $ff
+	
 ; sets a to $ff if there is a collision and $00 if there is no collision
 CheckForBoulderCollisionWithSprites: ; c636 (3:4636)
 	ld a, [wBoulderSpriteIndex]
@@ -2535,7 +2565,7 @@ CheckForBoulderCollisionWithSprites: ; c636 (3:4636)
 .success
 	xor a
 	ret
-
+	
 ApplyOutOfBattlePoisonDamage: ; c69c (3:469c)
 	ld a, [wd730]
 	add a
@@ -3478,11 +3508,17 @@ TryPushingBoulder: ; f225 (3:7225)
 	ret z
 	predef CheckForCollisionWhenPushingBoulder
 	ld a, [wTileInFrontOfBoulderAndBoulderCollisionResult]
+	cp $fe
+	jr z, .pushForwards
 	and a ; was there a collision?
 	jp nz, ResetBoulderPushFlags
+	call CheckForVictoryRoadMap
+.pushForwards
+	ld c, $0
+	rl c ; shift carry into c
 	ld a, [hJoyHeld]
-	ld b, a
-	ld a, [wSpriteStateData1 + 9] ; player's sprite facing direction
+	ld b, a ; get joypad state
+	ld a, [wSpriteStateData1 + 9] ; player's sprite facing direction	
 	cp SPRITE_FACING_UP
 	jr z, .pushBoulderUp
 	cp SPRITE_FACING_LEFT
@@ -3492,22 +3528,34 @@ TryPushingBoulder: ; f225 (3:7225)
 .pushBoulderDown
 	bit 7, b
 	ret z
+	dec c
 	ld de, PushBoulderDownMovementData
+	jr nz, .done
+	ld de, PushBoulderUpMovementData
 	jr .done
 .pushBoulderUp
 	bit 6, b
 	ret z
+	dec c
 	ld de, PushBoulderUpMovementData
+	jr nz, .done
+	ld de, PushBoulderDownMovementData
 	jr .done
 .pushBoulderLeft
 	bit 5, b
 	ret z
+	dec c
 	ld de, PushBoulderLeftMovementData
+	jr nz, .done
+	ld de, PushBoulderRightMovementData
 	jr .done
 .pushBoulderRight
 	bit 4, b
 	ret z
 	ld de, PushBoulderRightMovementData
+	dec c
+	jr nz, .done
+	ld de, PushBoulderLeftMovementData
 .done
 	call MoveSprite
 	ld a, SFX_PUSH_BOULDER

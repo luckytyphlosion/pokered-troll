@@ -685,6 +685,10 @@ Route23HiddenObjects: ; 46f5f (11:6f5f)
 	dbw BANK(HiddenItems),HiddenItems
 	db $5a,$08,MAX_ETHER
 	dbw BANK(HiddenItems),HiddenItems
+	db $1f,$12,$04
+	dbw BANK(Route23HelixOrDomeFossilText),Route23HelixOrDomeFossilText
+	db $1f,$13,$04
+	dbw BANK(Route23HelixOrDomeFossilText),Route23HelixOrDomeFossilText
 	db $FF
 VictoryRoad2HiddenObjects: ; 46f72 (11:6f72)
 	db $02,$05,ULTRA_BALL

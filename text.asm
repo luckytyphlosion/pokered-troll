@@ -676,6 +676,55 @@ _BillsHousePokemonListText2::
 	line "you want to see?"
 	done
 
+_DomeDisapprovesText::
+	text "The DOME FOSSILs"
+	line "are staring at"
+	cont "you disapprov-"
+	cont "ingly for not"
+	cont "rescuing their"
+	cont "brother in"
+	cont "MT MOON..."
+	
+	para "Perhaps the push-"
+	line "ing of a boulder"
+	cont "onto a switch"
+	cont "could resolve"
+	cont "this quarrel?"
+	prompt
+	
+_HelixDisapprovesText::
+	text "The HELIX FOSSILs"
+	line "are staring at"
+	cont "you disapprov-"
+	cont "ingly for not"
+	cont "rescuing their"
+	cont "brother in"
+	cont "MT MOON..."
+	
+	para "Perhaps the push-"
+	line "ing of a boulder"
+	cont "onto a switch"
+	cont "could resolve"
+	cont "this quarrel?"
+	prompt
+
+_BothHelixAndDomeDisapproveText::
+	text "Both the HELIX and"
+	line "and DOME FOSSILs"
+	line "are staring at"
+	cont "you disapprov-"
+	cont "ingly for not"
+	cont "rescuing their"
+	cont "brothers in"
+	cont "MT MOON..."
+	
+	para "Perhaps the push-"
+	line "ing of a boulder"
+	cont "onto a switch"
+	cont "could resolve"
+	cont "this quarrel?"
+	prompt
+	
 _OakLabEmailText::
 	text "There's an e-mail"
 	line "message here!"

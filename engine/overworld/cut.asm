@@ -196,6 +196,13 @@ GetCutOrBoulderDustAnimationOffsets: ; f068 (3:7068)
 	and a
 	ld hl, CutAnimationOffsets
 	jr z, .next
+	ld a, [wTileInFrontOfBoulderAndBoulderCollisionResult]
+	cp $fe
+	jr z, .regularBoulderDustOffsets
+	call CheckForVictoryRoadMap
+	ld hl, BoulderDustAnimationOffsets2
+	jr c, .next
+.regularBoulderDustOffsets
 	ld hl, BoulderDustAnimationOffsets
 .next
 	add hl, de
@@ -224,7 +231,13 @@ BoulderDustAnimationOffsets: ; f097 (3:7097)
 	db  8, -12 ; player is facing up
 	db -24, 20 ; player is facing left
 	db 40,  20 ; player is facing right
-
+	
+BoulderDustAnimationOffsets2:
+	db  8,  20 ; player is facing down
+	db  8,  20 ; player is facing up
+	db  8,  20 ; player is facing left
+	db  8,  20 ; player is facing right
+	
 	
 ReplaceTreeTileBlock_AfterCeladonBattle:
 	ld de, CutTreeBlockSwaps

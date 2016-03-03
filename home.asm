@@ -4772,3 +4772,6 @@ TextPredefs::
 	add_tx_pre ElevatorText                         ; 41
 	add_tx_pre PokemonStuffText                     ; 42
 	add_tx_pre VermillionGymNoPointCheckingText     ; 43
+	add_tx_pre HelixDisapprovesText
+	add_tx_pre DomeDisapprovesText
+	add_tx_pre BothHelixAndDomeDisapproveText
