@@ -2990,15 +2990,15 @@ Bankswitch:: ; 35d6 (0:35d6)
 	ld a,b
 	ld [H_LOADEDROMBANK],a
 	ld [MBC1RomBank],a
-	ld bc,.Return
-	push bc
-	jp [hl]
-.Return
+	call JumpToAddress
 	pop bc
 	ld a,b
 	ld [H_LOADEDROMBANK],a
 	ld [MBC1RomBank],a
 	ret
+
+JumpToAddress:
+	jp hl
 
 ; displays yes/no choice
 ; yes -> set carry

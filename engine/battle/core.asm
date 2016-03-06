@@ -4587,7 +4587,6 @@ GetDamageVarsForEnemyAttack: ; 3de75 (f:5e75)
 .done
 	ld a, $1
 	and a
-	and a
 	ret
 
 ; get stat c of enemy mon
@@ -5415,6 +5414,13 @@ IncrementMovePP: ; 3e373 (f:6373)
 	inc [hl] ; increment PP in the party memory location
 	ret
 
+_TestDamage:
+	xor a
+	ld [wCriticalHitOrOHKO], a
+	call GetDamageVarsForEnemyAttack
+	call CalculateDamage
+; fallthrough
+	
 ; function to adjust the base damage of an attack to account for type effectiveness
 AdjustDamageForMoveType: ; 3e3a5 (f:63a5)
 ; values for player turn
@@ -6816,6 +6822,15 @@ CalculateModifiedStat: ; 3eda5 (f:6da5)
 	pop bc
 	ret
 
+_CalculateModifiedStatWithBadgeBoosts:
+	call CalculateModifiedStat
+
+; fallthrough
+ApplyBadgeStatBoostsToChampion:
+	ld hl, wEnemyMonAttack
+	lb bc, $ff, $4
+	jr ApplyBadgeStatBoosts_continue
+
 ApplyBadgeStatBoosts: ; 3ee19 (f:6e19)
 	ld a, [wLinkState]
 	cp LINK_STATE_BATTLING
@@ -6830,6 +6845,7 @@ ApplyBadgeStatBoosts: ; 3ee19 (f:6e19)
 ; Thunder (bit 2) - defense
 ; Soul (bit 4) - speed
 ; Volcano (bit 6) - special
+ApplyBadgeStatBoosts_continue:
 .loop
 	srl b
 	call c, .applyBoostToStat

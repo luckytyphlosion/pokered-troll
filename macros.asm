@@ -177,6 +177,14 @@ RGB: MACRO
 	dw (\3 << 10 | \2 << 5 | \1)
 	ENDM
 
+dmgcmpstats: MACRO
+; \1: stat to boost for atk 1
+; \2: no. of boosts
+; \3: stat to boost for atk 2
+; \4: no. of boosts
+	lb bc, \1 << 4 | \2, \3 << 4 | \4
+ENDM
+
 ; text macros
 TX_NUM: MACRO
 ; print a big-endian decimal number.

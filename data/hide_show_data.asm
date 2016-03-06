@@ -179,7 +179,7 @@ MapHSPointers: ; c8f5 (3:48f5)
 	dw MapHSXX
 	dw MapHSXX
 	dw MapHSXX
-	dw MapHSXX
+	dw MapHSAE
 	dw MapHSXX
 	dw MapHSXX
 	dw MapHSB1
@@ -573,5 +573,7 @@ MapHSA2: ; cd8d (3:4d8d)
 	db SEAFOAM_ISLANDS_5,$01,Hide
 	db SEAFOAM_ISLANDS_5,$02,Hide
 	db SEAFOAM_ISLANDS_5,$03,Show
-
+MapHSAE:
+	db INDIGO_PLATEAU_LOBBY,$06,Hide
+	
 	db $FF,$01,Show

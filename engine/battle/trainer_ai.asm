@@ -107,7 +107,7 @@ AIMoveChoiceModificationFunctionPointers: ; 397a3 (e:57a3)
 	dw AIMoveChoiceModification1
 	dw AIMoveChoiceModification2
 	dw AIMoveChoiceModification3
-	dw AIMoveChoiceModification4 ; unused, does nothing
+	dw AIMoveChoiceModification4
 
 ; discourages moves that cause no damage but only a status ailment if player's mon already has one
 AIMoveChoiceModification1: ; 397ab (e:57ab)
@@ -255,9 +255,612 @@ AIMoveChoiceModification3: ; 39817 (e:5817)
 	jr z, .nextMove
 	inc [hl] ; sligthly discourage this move
 	jr .nextMove
+
 AIMoveChoiceModification4: ; 39883 (e:5883)
+	ld a, [wEnemyMonPartyPos]
+	add a
+	ld e, a
+	ld d, $0
+	ld hl, ChampionBattleIndividualMonAIs
+	add hl, de
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	ld a, [wChampionAICurScript]
+	add a
+	ld e, a
+	ld d, $0
+	add hl, de
+	ld a, [hli]
+	ld h, [hl]
+	ld l, a
+	jp hl
+
+ChampionBattleIndividualMonAIs:
+	dw ChampAI_Charizard
+	dw ChampAI_Raticate
+	dw ChampAI_Clefable
+	dw ChampAI_Nidoqueen
+	dw ChampAI_Blastoise
+	dw ChampAI_Nidoking
+	
+ChampAI_Charizard:
+	dw ChampAI_Charizard_SlashSpam
+	dw ChampAI_Charizard_FissureSpam
+	
+ChampAI_Raticate:
+	dw ChampAI_Raticate_FirstTurn
+	dw ChampAI_Raticate_BodySlam
+	dw ChampAI_Raticate_Thunderbolt
+
+ChampAI_Clefable:
+	dw ChampAI_Clefable_FirstTurn
+	dw ChampAI_Clefable_BodySlam
+	dw ChampAI_Clefable_Thunderbolt
+	
+ChampAI_Nidoqueen:
+	dw ChampAI_Nidoqueen_UseXSpeed
+	dw ChampAI_Nidoqueen_Thunderbolt
+	dw ChampAI_Nidoqueen_Earthquake
+	
+ChampAI_Blastoise:
+	dw ChampAI_Blastoise_UseXAccuracy
+	dw ChampAI_Blastoise_UseXSpeed
+	dw ChampAI_Blastoise_MegaKick
+	
+ChampAI_Nidoking:
+	dw ChampAI_Nidoqueen_UseXSpeed
+	dw ChampAI_Nidoqueen_Thunderbolt
+	dw ChampAI_Nidoqueen_Earthquake
+	
+ChampAI_Charizard_SlashSpam:
+	ld hl, wPlayerMonStatMods
+	lb bc, 7 + 1, $6 ; 6 mods in total
+.checkStatModsLoop
+	ld a, [hli]
+	cp b
+	jr nc, .statWasBoosted
+	dec c
+	jr nz, .checkStatModsLoop
+; forbid everything but slash
+	ld a, $2
+	jp ChampAI_ChooseMoveInA
+	
+.statWasBoosted
+	ld a, X_ACCURACY
+	ld [wAIItem], a
+	call AIPrintItemUse_
+	ld hl, wEnemyBattleStatus2
+	set UsingXAccuracy, [hl]
+	
+	ld a, $1
+	ld [wChampionAICurScript], a
 	ret
 
+ChampAI_Charizard_FissureSpam:
+	call ComparePlayerAndEnemySpeed
+	ld a, $3
+	jr c, .useFissure
+; use x speed or fire spin
+	call ComparePlayerAndEnemySpeed_EnemyHasSpeedBoost
+	jp c, AIUseXSpeed
+	xor a
+.useFissure
+	jp ChampAI_ChooseMoveInA
+
+ChampAI_Clefable_FirstTurn:
+ChampAI_Raticate_FirstTurn:
+	dmgcmpstats ATK, 1, SPC, 1
+	call CompareDamageBetweenBodySlamAndThunderbolt
+	jr c, .useBodySlam
+; x spc tbolt
+	call AIUseXSpecial
+	ld a, $2
+	jr .writeChampionAICurScript
+.useBodySlam
+	call AIUseXAttack
+	ld a, $1
+.writeChampionAICurScript
+	ld [wChampionAICurScript], a
+	ret
+
+ChampAI_Clefable_BodySlam:
+	call Random
+	cp 25
+	jr nc, ChampAI_Raticate_BodySlam
+	ld a, $3
+	jp ChampAI_ChooseMoveInA
+	
+ChampAI_Raticate_BodySlam:
+	call CompareDamageBetweenBodySlamAndThunderbolt_NoStatModifying
+	jr c, .useBodySlam
+; switch to thunderbolt, with a chance of using an x special
+	ld a, $2
+	ld [wChampionAICurScript], a
+	ld c, SPC
+	call ChampionTryUseStatUp
+	ret c
+	ld a, $1
+.useBodySlam
+	jp ChampAI_ChooseMoveInA
+
+ChampAI_Clefable_Thunderbolt:
+	call Random
+	cp 25
+	jr nc, ChampAI_Raticate_Thunderbolt
+	ld a, $3
+	jp ChampAI_ChooseMoveInA
+	
+ChampAI_Raticate_Thunderbolt:
+	call CompareDamageBetweenBodySlamAndThunderbolt_NoStatModifying
+	jr nc, .useThunderbolt
+; switch to body slam, with a chance of using an x attack
+	ld a, $1
+	ld [wChampionAICurScript], a
+	ld c, ATK
+	call ChampionTryUseStatUp
+	ret c
+	xor a
+.useThunderbolt
+	jp ChampAI_ChooseMoveInA
+	
+ChampAI_Nidoqueen_UseXSpeed:
+	call ComparePlayerAndEnemySpeed
+	jr c, .checkForXAccuracy
+	call ComparePlayerAndEnemySpeed_EnemyHasSpeedBoost
+	jp c, AIUseXSpeed
+	
+	dmgcmpstats ATK, 1, SPC, 1
+	lb de, EARTHQUAKE, THUNDERBOLT
+	call CompareDamageBetweenTwoMoves
+	jr c, .useEarthquake
+	ld a, [wEnemyMonSpecialMod]
+	cp 8
+	jr c, .useXSpecial
+	ld a, $1
+	ld [wChampionAICurScript], a
+	ld c, SPC
+	call ChampionTryUseStatUp
+	ret c
+	ld a, $1
+	jp ChampAI_ChooseMoveInA
+.useXSpecial
+	call AIUseXSpecial
+	ld a, $1
+	jr .setChampionCurScript
+.useEarthquake
+	ld a, [wEnemyMonAttackMod]
+	cp 8
+	jr c, .useXAttack
+	ld a, $2
+	ld [wChampionAICurScript], a
+	ld c, ATK
+	call ChampionTryUseStatUp
+	ret c
+	ld a, $3
+	jp ChampAI_ChooseMoveInA
+.useXAttack
+	call AIUseXAttack
+	ld a, $2
+.setChampionCurScript
+	ld [wChampionAICurScript], a
+	ret
+	
+.checkForXAccuracy
+	ld hl, wEnemyBattleStatus2
+	bit UsingXAccuracy, [hl]
+	set UsingXAccuracy, [hl]
+	jr nz, .useHornDrill
+	ld a, X_ACCURACY
+	ld [wAIItem], a
+	jp AIPrintItemUse_
+.useHornDrill
+	xor a
+	jp ChampAI_ChooseMoveInA
+	
+ChampAI_Nidoqueen_Thunderbolt:
+	dmgcmpstats ATK, 0, SPC, 0
+	lb de, EARTHQUAKE, THUNDERBOLT
+	call CompareDamageBetweenTwoMoves
+	jr nc, .useThunderbolt
+; try to horn drill again
+	call ChampionTryUseXSpeed
+	jr c, .goBackToXSpeed
+	ld a, $2
+	ld [wChampionAICurScript], a
+	ld c, ATK
+	call ChampionTryUseStatUp
+	ret c
+	ld a, $3
+	jp ChampAI_ChooseMoveInA
+.goBackToXSpeed
+	xor a
+	ld [wChampionAICurScript], a
+	ret
+.useThunderbolt
+	ld a, $1
+	jp ChampAI_ChooseMoveInA
+	
+ChampAI_Nidoqueen_Earthquake:
+	dmgcmpstats ATK, 0, SPC, 0
+	lb de, EARTHQUAKE, THUNDERBOLT
+	call CompareDamageBetweenTwoMoves
+	jr c, .useEarthquake
+; try to use horn drill again
+	call ChampionTryUseXSpeed
+	jr c, .goBackToXSpeed
+	ld a, $1
+	ld [wChampionAICurScript], a
+	ld c, SPC
+	call ChampionTryUseStatUp
+	ret c
+	ld a, $1
+	jp ChampAI_ChooseMoveInA
+.goBackToXSpeed
+	xor a
+	ld [wChampionAICurScript], a
+	ret
+.useEarthquake
+	ld a, $3
+	jp ChampAI_ChooseMoveInA
+	
+ChampAI_Blastoise_UseXAccuracy:
+	set UsingXAccuracy, [hl]
+	ld a, $1
+	ld [wChampionAICurScript], a
+	ld a, X_ACCURACY
+	ld [wAIItem], a
+	jp AIPrintItemUse_
+
+ChampAI_Blastoise_UseXSpeed:
+	call ComparePlayerAndEnemySpeed
+	jr c, .useFissure
+	call ComparePlayerAndEnemySpeed_EnemyHasSpeedBoost
+	jp c, AIUseXSpeed
+	
+	ld a, $2
+	ld [wChampionAICurScript], a
+	
+	ld a, [wEnemyMonAttackMod]
+	cp 8
+	jp c, AIUseXAttack
+	ld c, ATK
+	call ChampionTryUseStatUp
+	ret c
+	ld a, $2
+	jp ChampAI_ChooseMoveInA
+	
+ChampAI_Blastoise_MegaKick:
+	ld a, MEGA_KICK
+	call ReadMove
+	callab TestDamage
+	ld hl, wBattleMonMaxHP
+	ld a, [hli]
+	ld b, a
+	ld c, [hl]
+	
+	ld hl, wDamage
+	ld a, [hli]
+	ld l, [hl]
+	ld h, a
+; bc = player max hp
+; hl = potential damage
+
+; multiply potential damage by 3
+	ld d, h
+	ld e, l
+	add hl, hl
+	add hl, de
+	
+; is potential damage * 3 > max hp?
+; hl - bc
+	ld a, l
+	sub c
+	ld a, h
+	sbc b
+	jr nc, .useMegaKick
+; try to attempt to use an x item
+	call ChampionTryUseXSpeed
+	jr c, .goBackToXSpeed
+	call Random
+	cp 25 ; ~10% of using ice beam instead of mega kick
+	jr c, .useIceBeam
+.useMegaKick
+	ld a, $2
+	jp ChampAI_ChooseMoveInA
+.useIceBeam
+	ld a, $1
+	jp ChampAI_ChooseMoveInA
+.goBackToXSpeed
+	ld a, $1
+	ld [wChampionAICurScript], a
+	ret
+	
+CompareDamageBetweenBodySlamAndThunderbolt_NoStatModifying:
+	dmgcmpstats ATK, 0, SPC, 0
+	
+CompareDamageBetweenBodySlamAndThunderbolt:
+	lb de, BODY_SLAM, THUNDERBOLT
+	
+; fallthrough
+CompareDamageBetweenTwoMoves:
+; compares the damage the selected two moves would do
+; input:
+; b:
+; - which stat to boost for first attack
+; - low nybble = number of boosts from current stat mod, high nybble = which stat
+; c: 
+; - which stat to boost for second attack
+; - low nybble = number of boosts from current stat mod, high nybble = which stat
+; d: move 1
+; e: move 2
+; output:
+; carry if move1 > move2, no carry if move2 < move1
+	push bc
+	push de
+	ld c, d
+	call TestDamage
+	ld a, [wDamage]
+	ld [wSavedDamage], a
+	ld a, [wDamage+1]
+	ld [wSavedDamage+1], a
+	pop de
+	pop bc
+	ld b, c
+	ld c, e
+	call TestDamage
+	ld a, [wDamage]
+	ld b, a
+	ld a, [wDamage+1]
+	ld c, a
+	ld a, [wSavedDamage]
+	ld d, a
+	ld a, [wSavedDamage+1]
+	ld e, a
+; bc = move1 damage
+; de = move2 damage
+	ld a, e
+	sub c
+	ld a, d
+	sbc b
+	ret
+
+TestDamage:
+	push bc
+	ld a, b
+	swap a
+	and $f
+	ld e, a
+	ld d, $0
+	ld hl, wEnemyMonStatMods
+	add hl, de
+	
+	ld a, b
+	and $f
+	add [hl]
+	cp 14
+	jr c, .doNotSetMaxStatModValue
+	ld a, 14
+.doNotSetMaxStatModValue
+	ld [hl], a
+	push hl ; address of modified stat mod
+	
+	ld a, c
+	call ReadMove
+	ld a, b
+	swap a
+	and $f
+	ld c, a ; index for CalculateModifiedStat
+	
+	add a
+	ld e, a
+	ld d, $0
+	ld hl, wEnemyMonAttack
+	add hl, de
+	ld a, [hli]
+	ld d, a
+	ld e, [hl]
+	push hl ; address of stat
+	push de ; save stat to modify for later
+	call CalculateModifiedStatWithBadgeBoosts
+	callab _TestDamage
+	pop de
+	pop hl
+	ld a, e
+	ld [hld], a
+	ld [hl], d
+	
+	pop hl ; restore address of modified stat mod
+	pop bc ; restore number of boosts
+	ld a, [hl]
+	sub b
+	ld [hl], a
+	ret
+
+	
+ChampAI_ChooseMoveInA:
+; choose the move with index in a
+	ld hl, wBuffer
+	ld c, a
+	xor a
+.loop
+	cp c
+	jr z, .skip
+	ld [hl], $50
+.skip
+	inc hl
+	inc a
+	cp NUM_MOVES
+	jr nz, .loop
+	ret
+
+ComparePlayerAndEnemySpeed_EnemyHasSpeedBoost:
+; check if using an x speed would result in the enemy
+; outspeeding the player
+	ld a, [wEnemyMonSpeedMod]
+	cp 14
+	ret nc ; if we can't boost anymore, do not bother recalculating
+	inc a
+	ld [wEnemyMonSpeedMod], a
+	
+	ld a, [wEnemyMonSpeed]
+	ld b, a
+	ld a, [wEnemyMonSpeed+1]
+	ld c, a
+	push bc ; store the speed to prevent it from being overwritten
+	
+	ld c, SPC
+	call CalculateModifiedStatWithBadgeBoosts
+	call ComparePlayerAndEnemySpeed
+	pop bc
+	ld a, b
+	ld [wEnemyMonSpeed], a
+	ld a, c
+	ld [wEnemyMonSpeed+1], a
+	
+	push af ; save flags
+	ld hl, wEnemyMonSpeedMod
+	dec [hl]
+	pop af
+	ret
+	
+CalculateModifiedStatWithBadgeBoosts:
+	ld a, $1
+	ld [wCalculateWhoseStats], a
+	jpab _CalculateModifiedStatWithBadgeBoosts
+
+ComparePlayerAndEnemySpeed:
+; compare PSpeed and ESpeed
+; output:
+; carry if enemy is faster
+; no carry if enemy is slower
+; zero flag if speedtie
+	push bc
+	push de
+	ld a, [wBattleMonSpeed]
+	ld b, a
+	ld a, [wBattleMonSpeed+1]
+	ld c, a
+	ld a, [wEnemyMonSpeed]
+	ld d, a
+	ld a, [wEnemyMonSpeed+1]
+	ld e, a
+; bc = player speed
+; de = enemy speed
+	ld a, c
+	sub e
+	ld a, b
+	sbc d
+	pop de
+	pop bc
+	ret
+
+ChampionTryUseXSpeed:
+	ld a, SPD
+	ld [wSavedChampionStatItem], a
+	jr _ChampionTryUseXSpeed
+
+ChampionTryUseStatUp:
+; input:
+; c = current stat (0 = attack, 1 = def...)
+	ld a, c
+	ld [wSavedChampionStatItem], a
+	
+	ld hl, wEnemyMonStatMods
+	ld b, $0
+	add hl, bc
+	ld a, [hl]
+	
+	dec a
+	ld e, a
+	ld d, $0
+	ld hl, StatModifierProbabilityTable
+	add hl, de
+	ld b, [hl]
+	call Random
+	cp b ; is rand < probability value?
+	ret nc ; if not, do not stat up
+; also factor in current HP
+_ChampionTryUseXSpeed:
+	xor a
+	ld [H_MULTIPLICAND], a
+	ld [H_MULTIPLICAND+1], a
+	
+	ld a, [wEnemyMonHP]
+	ld [H_MULTIPLICAND+2], a
+	ld a, [wEnemyMonHP+1]
+	ld [H_MULTIPLICAND+3], a
+	
+	ld a, 255
+	ld [H_MULTIPLIER], a
+	call Multiply
+	
+	
+	ld hl, wEnemyMonMaxHP
+	ld a, [hli]
+	ld b, a
+	ld c, [hl]
+	
+	and a ; is the value 16-bit?
+	jr z, .eightBitDivisor
+; scale by 4, and divide product of previous calc. by 4
+	srl b
+	rr c
+	srl b
+	rr c
+	ld hl, H_MULTIPLICAND+1
+	srl [hl]
+	inc l
+	rr [hl]
+	inc l
+	rr [hl]
+	dec l
+	dec l
+	srl [hl]
+	inc l
+	rr [hl]
+	inc l
+	rr [hl]
+.eightBitDivisor
+	ld a, c
+	ld [H_DIVISOR], a
+	ld b, $4
+	call Divide
+	ld a, [H_QUOTIENT+3]
+	ld b, a
+; do the following probability check twice:
+; check if a random number is less than the quotient
+; if either checks succeed, use an x item
+	call Random
+	cp b
+	jr c, .success
+	call Random
+	cp b
+	ret nc
+.success
+	ld a, [wSavedChampionStatItem]
+	ld c, a
+	ld a, ATTACK_UP1_EFFECT
+	add c
+	ld b, a
+	ld a, c
+	add X_ATTACK
+	jp AIIncreaseStat
+	
+StatModifierProbabilityTable:
+	db 223
+	db 218
+	db 212
+	db 204
+	db 191
+	db 170
+	db 127
+	db 85
+	db 63
+	db 51
+	db 42
+	db 36
+	
 ReadMove: ; 39884 (e:5884)
 	push hl
 	push de
@@ -318,11 +921,12 @@ TrainerClassMoveChoiceModifications: ; 3989b (e:589b)
 	db 1,3,0  ; SABRINA
 	db 1,2,0  ; GENTLEMAN
 	db 1,3,0  ; SONY2
-	db 1,3,0  ; SONY3
+	db 1,4,0  ; SONY3
 	db 1,2,3,0; LORELEI
 	db 1,0    ; CHANNELER
 	db 1,0    ; AGATHA
 	db 1,3,0  ; LANCE
+	db 1,3,0  ; SONY4
 
 INCLUDE "engine/battle/trainer_pic_money_pointers.asm"
 
@@ -419,6 +1023,7 @@ TrainerAIPointers: ; 3a55c (e:655c)
 	dbw 3,GenericAI
 	dbw 2,AgathaAI ; agatha
 	dbw 1,LanceAI ; lance
+	dbw 1,GenericAI
 
 JugglerAI: ; 3a5e9 (e:65e9)
 	cp $40

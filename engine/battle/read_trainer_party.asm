@@ -49,11 +49,13 @@ ReadTrainer: ; 39c53 (e:5c53)
 	ld a,[hli]
 	cp $FF ; is the trainer special?
 	jr z,.SpecialTrainer ; if so, check for special moves
+	cp $FE
+	jr z, .championTrainer
 	ld [wCurEnemyLVL],a
 .LoopTrainerData
 	ld a,[hli]
 	and a ; have we reached the end of the trainer data?
-	jr z,.FinishUp
+	jr z,.finishUp
 	ld [wcf91],a ; write species somewhere (XXX why?)
 	ld a,ENEMY_PARTY_DATA
 	ld [wMonDataLocation],a
@@ -68,7 +70,7 @@ ReadTrainer: ; 39c53 (e:5c53)
 ; - if [wLoneAttackNo] != 0, one pokemon on the team has a special move
 	ld a,[hli]
 	and a ; have we reached the end of the trainer data?
-	jr z,.AddLoneMove
+	jr z,.addLoneMove
 	ld [wCurEnemyLVL],a
 	ld a,[hli]
 	ld [wcf91],a
@@ -78,7 +80,76 @@ ReadTrainer: ; 39c53 (e:5c53)
 	call AddPartyMon
 	pop hl
 	jr .SpecialTrainer
-.AddLoneMove
+.championTrainer
+	push hl
+	ld hl, wPartySpecies
+	ld c, $0
+.findBlastoiseLoop
+	ld a, [hli]
+	cp BLASTOISE
+	jr z, .foundBlastoise
+	inc c
+	cp $ff
+	jr nz, .findBlastoiseLoop
+; if the player doesn't have blastoise in the party
+; troll with team with 6 level 100 mewtwos
+; Kappa
+	ld hl, TrollGreen3Data
+	ld a, SONY4
+	ld [wCurOpponent], a
+	pop hl
+	jr .SpecialTrainer
+.foundBlastoise
+	ld a, c
+	ld bc, wPartyMon2 - wPartyMon1
+	ld hl, wPartyMon1Level
+	call AddNTimes
+	ld b, [hl]
+	pop hl
+	ld de, $0
+.championTrainerLoop
+	ld a, [hli]
+	and a ; have we reached the end of the trainer data?
+	jr z,.finishUp
+	ld c, a ; c = enemy level
+	ld a, b ; b = player level
+	cp 55 ; are we level 54 or lower?
+	jr c, .usePresetLevel ; if so, just use the default levels
+	ld a, c
+	sub 55
+	add b ; calc enemy level - 55 + player level and use that as the new level
+.usePresetLevel
+	ld [wCurEnemyLVL],a
+	ld a,[hli]
+	ld [wcf91],a
+	ld a,ENEMY_PARTY_DATA
+	ld [wMonDataLocation],a
+	push bc
+	push hl
+	push de
+	call AddPartyMon
+	pop de
+	ld a, e ; get current mon value
+	ld hl, wEnemyMon1Moves
+	ld bc, wEnemyMon2 - wEnemyMon1
+	call AddNTimes
+	ld b, e ; save current mon value
+	ld c, NUM_MOVES
+	ld d, h
+	ld e, l ; de = enemy moves
+	pop hl
+.writeChampionMovesLoop
+	ld a, [hli]
+	ld [de], a
+	inc de
+	dec c
+	jr nz, .writeChampionMovesLoop
+	ld e, b ; restore current mon value
+	pop bc
+	inc e
+	jr .championTrainerLoop
+	
+.addLoneMove
 ; does the trainer have a single monster with a different move
 	ld a,[wLoneAttackNo] ; Brock is 01, Misty is 02, Erika is 04, etc
 	and a

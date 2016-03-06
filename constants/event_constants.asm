@@ -2271,7 +2271,7 @@ const_value = 0
 	const EVENT_8DC                                  ; 8DC, (D862, bit 4)
 	const EVENT_8DD                                  ; 8DD, (D862, bit 5)
 	const EVENT_8DE                                  ; 8DE, (D862, bit 6)
-	const EVENT_8DF                                  ; 8DF, (D862, bit 7)
+	const EVENT_TALKED_TO_E4_RAGEQUIT_GUY              ; 8DF, (D862, bit 7)
 	const ELITE4_EVENTS_START                        ; 8E0, (D863, bit 0)
 	const EVENT_BEAT_LORELEIS_ROOM_TRAINER_0         ; 8E1, (D863, bit 1)
 	const EVENT_8E2                                  ; 8E2, (D863, bit 2)

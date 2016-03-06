@@ -892,6 +892,10 @@ wWhichTrade:: ; cd3d
 
 wTrainerSpriteOffset:: ; cd3d
 
+wIndigoPlateauXItemFlags:: ; cd3d
+; bit 0: bought x items
+; bit 1: sold x items
+
 wUnusedCD3D:: ; cd3d
 	ds 1
 
@@ -1562,6 +1566,7 @@ wBattleMon:: battle_struct wBattleMon ; d014
 wTrainerClass:: ; d031
 	ds 1
 
+wSavedChampionStatItem:: ; d032
 	ds 1
 
 wTrainerPicPointer:: ; d033
@@ -2035,7 +2040,10 @@ wSavedTilesetType:: ; d0d4
 ; saved at the start of a battle and then written back at the end of the battle
 	ds 1
 
-	ds 2
+wChampionAICurScript:: ; d0d5
+	ds 1
+	
+	ds 1
 
 
 wDamage:: ; d0d7
@@ -2186,7 +2194,10 @@ wSavedSpriteMapY:: ; d132
 wSavedSpriteMapX:: ; d133
 	ds 1
 
-	ds 5
+wSavedDamage:: ; d134
+	ds 2
+
+	ds 3
 
 wWhichPrize:: ; d139
 	ds 1
@@ -2810,6 +2821,7 @@ wUnknownDungeon3CurScript:: ; d650
 	ds 1
 wVictoryRoad1CurScript:: ; d651
 	ds 1
+wIndigoPlateauLobbyCurScript:: ; d652
 	ds 1
 wLanceCurScript:: ; d653
 	ds 1
@@ -2877,7 +2889,10 @@ wRocketHideout2EncounterTrapFlags::
 wRocketHideout3EncounterTrapFlags::
 	ds 1
 	
-	ds 7
+wXItemQuantitiesAtIndigoPlateau::
+	ds 5
+	
+	ds 2
 
 wTownVisitedFlag:: ; d70b
 	flag_array 13
@@ -3005,6 +3020,7 @@ wd730:: ; d730
 ; bit 7: set if joypad states are being simulated in the overworld or an NPC's movement is being scripted
 	ds 1
 
+wRagequitGuySisterFlags::
 	ds 1
 
 wd732:: ; d732
