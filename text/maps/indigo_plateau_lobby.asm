@@ -107,9 +107,9 @@ _RagequitGuySisterText3::
 	line "the point of"
 	cont "selling X ITEMs."
 	
-	para $72, "Oh, but I needed money"
-	line "to buy healing"
-	cont "items...",$73,", you'd"
+	para $72, "Oh, but I needed"
+	line "money to buy hea-"
+	cont "ling items...",$73,","
 	cont "you'd might say."
 	
 	para "What a pitiful"

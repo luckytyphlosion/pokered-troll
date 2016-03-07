@@ -33,8 +33,6 @@ IndigoPlateauLobbyScript0:
 	ld a, HS_INDIGO_PLATEAU_LOBBY_RAGEQUIT_GUY
 	ld [wMissableObjectIndex], a
 	predef ShowObject
-	ld c, 30
-	call DelayFrames
 	
 	ld a, $6
 	ld [H_SPRITEINDEX], a
@@ -50,6 +48,9 @@ IndigoPlateauLobbyScript1:
 	ld a, [wd730]
 	bit 0, a
 	ret nz
+	ld a, D_DOWN | D_UP | D_LEFT | D_RIGHT | START | SELECT
+	ld [wJoyIgnore], a
+	
 	ld a, $6
 	ld [H_SPRITEINDEX], a
 	ld a, SPRITE_FACING_UP
@@ -93,7 +94,9 @@ IndigoPlateauLobbyScript2:
 	dec d
 	jr nz, .loop
 	ld b, X_ACCURACY
+	push hl
 	predef GetQuantityOfItemInBag
+	pop hl
 	ld [hl], b
 	
 	xor a
@@ -117,7 +120,7 @@ IndigoPlateauLobbyScript3:
 	
 IndigoPlateauLobby_RagequitGuyMovement2:
 	db NPC_MOVEMENT_RIGHT
-; fallthrough
+	
 IndigoPlateauLobby_RagequitGuyMovement1:
 	db NPC_MOVEMENT_DOWN
 	db NPC_MOVEMENT_DOWN

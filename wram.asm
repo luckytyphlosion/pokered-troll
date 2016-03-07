@@ -1757,6 +1757,7 @@ wObjectToHide:: ; d079
 wObjectToShow:: ; d07a
 	ds 1
 
+wChampionUsedXItem::
 	ds 1
 
 wDefaultMap:: ; d07c
@@ -1862,11 +1863,13 @@ wEndBattleWinTextPointer:: ; d08c
 wEndBattleLoseTextPointer:: ; d08e
 	ds 2
 
+wSavedPartyMonStatExpPtr::
 	ds 2
 
 wEndBattleTextRomBank:: ; d092
 	ds 1
-
+	
+wChampionAIClefableFirstTurn::
 	ds 1
 
 wSubAnimAddrPtr:: ; d094
@@ -2043,6 +2046,7 @@ wSavedTilesetType:: ; d0d4
 wChampionAICurScript:: ; d0d5
 	ds 1
 	
+wChampionSwappedOutToGolbat:: ; d0d6
 	ds 1
 
 

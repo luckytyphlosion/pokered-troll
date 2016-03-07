@@ -3688,6 +3688,26 @@ CalcStat:: ; 394a (0:394a)
 	and a
 	jr z, .statExpDone  ; consider stat exp?
 	add hl, bc          ; skip to corresponding stat exp value
+	ld a, [wCurOpponent]
+	cp OPP_SONY3 ; stupid hardcode because gamefreak sucks at coding sqrt functions in assembly
+	jr nz, .statExpLoop
+	push hl
+	push bc
+	ld a, [hld]
+	ld h, [hl]
+	ld l, a
+	xor a
+	ld bc, $1
+.statExpLoop2
+	inc a
+	dec c
+	dec bc
+	add hl, bc
+	jr c, .statExpLoop2
+	pop bc
+	pop hl
+	ld b, a
+	jr .statExpDone
 .statExpLoop            ; calculates ceil(Sqrt(stat exp)) in b
 	xor a
 	ld [H_MULTIPLICAND], a

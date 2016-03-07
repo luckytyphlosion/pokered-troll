@@ -185,6 +185,14 @@ dmgcmpstats: MACRO
 	lb bc, \1 << 4 | \2, \3 << 4 | \4
 ENDM
 
+weighstats: MACRO
+	IF \1 | \2 | \3 | \4 == 0
+		db 0
+	ELSE
+		db \4 << 6 | \3 << 4 | \2 << 2 | \1
+	ENDC
+ENDM
+
 ; text macros
 TX_NUM: MACRO
 ; print a big-endian decimal number.

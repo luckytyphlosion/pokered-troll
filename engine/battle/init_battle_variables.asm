@@ -18,6 +18,7 @@ InitBattleVariables: ; 525af (14:65af)
 	ld [wPlayerMonNumber], a
 	ld [wEscapedFromBattle], a
 	ld [wMapPalOffset], a
+	ld [wChampionAIClefableFirstTurn], a
 	ld hl, wPlayerHPBarColor
 	ld [hli], a ; wPlayerHPBarColor
 	ld [hl], a ; wEnemyHPBarColor

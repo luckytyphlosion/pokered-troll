@@ -55,7 +55,7 @@ ReadTrainer: ; 39c53 (e:5c53)
 .LoopTrainerData
 	ld a,[hli]
 	and a ; have we reached the end of the trainer data?
-	jr z,.finishUp
+	jp z,.finishUp
 	ld [wcf91],a ; write species somewhere (XXX why?)
 	ld a,ENEMY_PARTY_DATA
 	ld [wMonDataLocation],a
@@ -70,7 +70,7 @@ ReadTrainer: ; 39c53 (e:5c53)
 ; - if [wLoneAttackNo] != 0, one pokemon on the team has a special move
 	ld a,[hli]
 	and a ; have we reached the end of the trainer data?
-	jr z,.addLoneMove
+	jp z,.addLoneMove
 	ld [wCurEnemyLVL],a
 	ld a,[hli]
 	ld [wcf91],a
@@ -94,6 +94,7 @@ ReadTrainer: ; 39c53 (e:5c53)
 ; if the player doesn't have blastoise in the party
 ; troll with team with 6 level 100 mewtwos
 ; Kappa
+.blastoiseNotHighEnoughLevel
 	ld hl, TrollGreen3Data
 	ld a, SONY4
 	ld [wCurOpponent], a
@@ -102,15 +103,28 @@ ReadTrainer: ; 39c53 (e:5c53)
 .foundBlastoise
 	ld a, c
 	ld bc, wPartyMon2 - wPartyMon1
-	ld hl, wPartyMon1Level
+	ld hl, wPartyMon1
 	call AddNTimes
+	push hl
+	ld bc, wPartyMon1HPExp - wPartyMon1
+	add hl, bc
+	ld a, l
+	ld [wSavedPartyMonStatExpPtr], a
+	ld a, h
+	ld [wSavedPartyMonStatExpPtr + 1], a
+	pop hl
+	ld bc, wPartyMon1Level - wPartyMon1
+	add hl, bc
 	ld b, [hl]
+	ld a, b
+	cp 45
+	jr c, .blastoiseNotHighEnoughLevel
 	pop hl
 	ld de, $0
 .championTrainerLoop
 	ld a, [hli]
 	and a ; have we reached the end of the trainer data?
-	jr z,.finishUp
+	jp z,.finishUp
 	ld c, a ; c = enemy level
 	ld a, b ; b = player level
 	cp 55 ; are we level 54 or lower?
@@ -146,6 +160,40 @@ ReadTrainer: ; 39c53 (e:5c53)
 	jr nz, .writeChampionMovesLoop
 	ld e, b ; restore current mon value
 	pop bc
+	
+	push hl
+	push bc
+	push de
+	ld a, e
+	ld hl, wEnemyMon1
+	ld bc, wEnemyMon2 - wEnemyMon1
+	call AddNTimes
+	push hl
+	ld bc, wEnemyMon1HPExp - wEnemyMon1
+	add hl, bc
+	ld d, h
+	ld e, l
+	ld a, [wSavedPartyMonStatExpPtr]
+	ld l, a
+	ld a, [wSavedPartyMonStatExpPtr + 1]
+	ld h, a
+	ld bc, NUM_STATS * 2
+	call CopyData
+	pop hl
+	
+	push hl
+	ld bc, wEnemyMon1Stats - wEnemyMon1
+	add hl, bc
+	ld d, h
+	ld e, l
+	pop hl
+	ld bc, wEnemyMon1HPExp - 1 - wEnemyMon1
+	add hl, bc
+	ld b, $1
+	call CalcStats
+	pop de
+	pop bc
+	pop hl
 	inc e
 	jr .championTrainerLoop
 	
@@ -166,7 +214,7 @@ ReadTrainer: ; 39c53 (e:5c53)
 	ld bc,wEnemyMon2 - wEnemyMon1
 	call AddNTimes
 	ld [hl],d
-	jr .FinishUp
+	jr .finishUp
 .AddTeamMove
 ; check if our trainer's team has special moves
 
@@ -189,11 +237,11 @@ ReadTrainer: ; 39c53 (e:5c53)
 	ld a,b
 	cp SONY3
 	jr z,.ChampionRival
-	jr .FinishUp ; nope
+	jr .finishUp ; nope
 .GiveTeamMoves
 	ld a,[hl]
 	ld [wEnemyMon5Moves + 2],a
-	jr .FinishUp
+	jr .finishUp
 .ChampionRival ; give moves to his team
 
 ; pidgeot
@@ -212,7 +260,7 @@ ReadTrainer: ; 39c53 (e:5c53)
 .GiveStarterMove
 	ld a,b
 	ld [wEnemyMon6Moves + 2],a
-.FinishUp
+.finishUp
 ; clear wAmountMoneyWon addresses
 	xor a
 	ld de,wAmountMoneyWon

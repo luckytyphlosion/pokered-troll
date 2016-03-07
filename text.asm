@@ -1257,6 +1257,11 @@ _TrainerSentOutText::
 	text "!"
 	done
 
+_AgathaSentOutGolbatText::
+	text "AGATHA sent"
+	line "out TROLLBAT!"
+	done
+	
 _NoWillText::
 	text "There's no will"
 	line "to fight!"
@@ -1405,41 +1410,15 @@ _MoveIsDisabledText::
 	prompt
 
 _MonName1Text::
-	text $5a, "@@"
-
-_Used1Text::
-	db $0
+	text $5a
 	line "used @@"
-
-_Used2Text::
-	db $0
-	line "used @@"
-
-_InsteadText::
+	
+_InsteadText:: ; 89a56 (22:5a56)
 	text "instead,"
-	cont "@@"
+	cont $55, "@@"
 
-_CF4BText::
+_MoveNameWithExclamationText:: ; 89a62 (22:5a62)
 	TX_RAM wcf4b
-	text "@"
-
-_ExclamationPoint1Text::
-	text "!"
-	done
-
-_ExclamationPoint2Text::
-	text "!"
-	done
-
-_ExclamationPoint3Text::
-	text "!"
-	done
-
-_ExclamationPoint4Text::
-	text "!"
-	done
-
-_ExclamationPoint5Text::
 	text "!"
 	done
 

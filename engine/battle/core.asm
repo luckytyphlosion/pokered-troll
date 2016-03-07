@@ -434,6 +434,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
 	call SaveScreenTilesToBuffer1
 	xor a
 	ld [wFirstMonsNotOutYet], a
+	ld [wChampionUsedXItem], a
 	ld a, [wPlayerBattleStatus2]
 	and (1 << NeedsToRecharge) | (1 << UsingRage) ; check if the player is using Rage or needs to recharge
 	jr nz, .selectEnemyMove
@@ -511,6 +512,14 @@ MainInBattleLoop: ; 3c233 (f:4233)
 .asm_3c2dd
 	callab SwitchEnemyMon
 .noLinkBattle
+	ld a, [wChampionSwappedOutToGolbat]
+	and a
+	ld a, $0
+	ld [wChampionSwappedOutToGolbat], a
+	jp nz, Champion_SendOutGolbatWithHaze
+	ld a, [wChampionUsedXItem]
+	and a
+	jr nz, .AIActionUsedEnemyFirst
 	ld a, [wPlayerSelectedMove]
 	cp QUICK_ATTACK
 	jr nz, .playerDidNotUseQuickAttack
@@ -1444,6 +1453,7 @@ EnemySendOutFirstMon: ; 3c92a (f:492a)
 	ld [wEnemyDisabledMove],a
 	ld [wEnemyDisabledMoveNumber],a
 	ld [wEnemyMonMinimized],a
+	ld [wChampionAICurScript], a
 	ld hl,wPlayerUsedMove
 	ld [hli],a
 	ld [hl],a
@@ -1562,6 +1572,7 @@ EnemySendOutFirstMon: ; 3c92a (f:492a)
 	ld b, SET_PAL_BATTLE
 	call RunPaletteCommand
 	call GBPalNormal
+Champion_SendOutGolbatWithHaze_AfterGolbatFaint:
 	ld hl,TrainerSentOutText
 	call PrintText
 	ld a,[wEnemyMonSpecies2]
@@ -1586,6 +1597,158 @@ EnemySendOutFirstMon: ; 3c92a (f:492a)
 	call SaveScreenTilesToBuffer1
 	jp SwitchPlayerMon
 
+Champion_SendOutGolbatWithHaze:
+	ld hl, AIBattleWithdrawText2
+	call PrintText
+	ld a, $8
+	coord hl, 18, 0
+	call SlideTrainerPicOffScreen
+	ld a, GOLBAT
+	ld [wcf91], a
+	ld [wd0b5], a
+	call GetMonHeader
+	ld de,vFrontPic
+	call LoadMonFrontSprite
+	ld c, 10
+	call DelayFrames
+	ld hl, AgathaSentOutGolbatText
+	call PrintText
+	ld a, -$31
+	ld [hStartTileID],a
+	coord hl, 0, 0
+	lb bc, 4, 11
+	call ClearScreenArea
+; store current mon's HP and max HP on the stack	
+	ld hl, wEnemyMonHP + 1
+	ld a, [hld]
+	ld e, a
+	ld d, [hl]
+	push de
+	xor a
+	ld [hli], a
+	ld [hl], a ; set golbat's HP to 0
+	
+	ld hl, wEnemyMonMaxHP + 1
+	ld a, [hld]
+	ld e, a
+	ld d, [hl]
+	push de
+	xor a
+	ld [hli], a
+	ld [hl], 158
+	
+; copy mon name to grass data
+	ld hl, wEnemyMonNick
+	push hl
+	ld de, wGrassRate
+	ld bc, NAME_LENGTH
+	call CopyData
+	
+; copy "TROLLBAT" to enemy mon nick
+	ld hl, TrollbatString
+	pop de
+	ld bc, TrollbatStringEnd - TrollbatString
+	call CopyData
+	
+	ld c, 40
+	call DelayFrames
+	
+	coord hl, 15, 6
+	predef AnimateSendingOutMon
+	call DrawEnemyHUDAndHPBar
+	
+	ld a, GOLBAT
+	call PlayCry
+	
+	ld hl, HazeString
+	ld de, wcf4b
+	ld bc, HazeStringEnd - HazeString
+	call CopyData
+	
+	ld a, [H_WHOSETURN]
+	push af
+	xor a
+	ld [wAnimationType], a
+	ld [wActionResultOrTookBattleTurn], a
+	inc a
+	ld [H_WHOSETURN], a
+	call PrintMonName1Text
+	ld a, HAZE
+	ld [wEnemyMoveNum], a
+	call HazeEffect
+	pop af
+	ld [H_WHOSETURN], a
+	
+	ld c, 30
+	call DelayFrames
+	
+	coord hl, 12, 5
+	coord de, 12, 6
+	call SlideDownFaintedMonPic
+	coord hl, 0, 0
+	lb bc, 4, 11
+	call ClearScreenArea
+	
+	xor a
+	ld [wFrequencyModifier], a
+	ld [wTempoModifier], a
+	ld a, SFX_FAINT_FALL
+	call PlaySoundWaitForCurrent
+.sfxwait
+	ld a, [wChannelSoundIDs + CH4]
+	cp SFX_FAINT_FALL
+	jr z, .sfxwait
+	ld a, SFX_FAINT_THUD
+	call PlaySound
+	call WaitForSoundToFinish
+	
+	ld hl, EnemyMonFaintedText
+	call PrintText
+	call PrintEmptyString
+	
+	pop de
+	ld a, e
+	ld [wEnemyMonMaxHP + 1], a
+	ld a, d
+	ld [wEnemyMonMaxHP], a
+	
+	pop de
+	ld a, e
+	ld [wEnemyMonHP + 1], a
+	ld a, d
+	ld [wEnemyMonHP], a
+	
+	ld hl, wGrassRate
+	ld de, wEnemyMonNick
+	ld bc, NAME_LENGTH
+	call CopyData
+	
+	ld a, [wCurrentMenuItem]
+	push af
+	ld a, $1
+	ld [wCurrentMenuItem], a
+	call Champion_SendOutGolbatWithHaze_AfterGolbatFaint
+	pop af
+	ld [wCurrentMenuItem], a
+	jp MainInBattleLoop
+	
+	
+TrollbatString:
+	db "TROLLBAT@"
+TrollbatStringEnd:
+	
+HazeString:
+	db "HAZE@"
+HazeStringEnd:
+
+AIBattleWithdrawText2:
+	TX_FAR _AIBattleWithdrawText
+	db "@"
+
+AgathaSentOutGolbatText:
+	TX_FAR _AgathaSentOutGolbatText
+	db "@"
+	
 TrainerAboutToUseText: ; 3ca79 (f:4a79)
 	TX_FAR _TrainerAboutToUseText
 	db "@"
@@ -3112,6 +3275,9 @@ SelectEnemyMove: ; 3d564 (f:5564)
 	dec a
 	jr z, .chooseRandomMove ; wild encounter
 	callab AIEnemyTrainerChooseMoves
+	ld a, [wChampionUsedXItem]
+	and a
+	ret nz
 .chooseRandomMove
 	push hl
 	call BattleRandom
@@ -3406,7 +3572,23 @@ MirrorMoveCheck
 	jr z,.notDone
 	jp ExecutePlayerMoveDone ; otherwise, we're done if the move missed
 .moveDidNotMiss
+	ld a, [wCurOpponent]
+	cp OPP_SONY3
+	jr nz, .useMoveOnEnemy
+	ld a, [wCriticalHitOrOHKO]
+	cp $2
+	jr nz, .useMoveOnEnemy
+	ld a, [wEnemyMoveEffect]
+	push af
+	ld a, OHKO_EFFECT
+	ld [wEnemyMoveEffect], a
+	call ApplyAttackToPlayerPokemon
+	pop af
+	ld [wEnemyMoveEffect], a
+	jr .afterUsingOHKOMoveOnSelf
+.useMoveOnEnemy
 	call ApplyAttackToEnemyPokemon
+.afterUsingOHKOMoveOnSelf
 	call PrintCriticalOHKOText
 	callab DisplayEffectiveness
 	ld a,1
@@ -3921,136 +4103,26 @@ MonName1Text: ; 3dafb (f:5afb)
 	and a
 	ld a, [wPlayerMoveNum]
 	ld hl, wPlayerUsedMove
-	jr z, .asm_3db11
+	jr z, .player
 	ld a, [wEnemyMoveNum]
 	ld hl, wEnemyUsedMove
-.asm_3db11
+.player
 	ld [hl], a
 	ld [wd11e], a
-	call DetermineExclamationPointTextNum
 	ld a, [wMonIsDisobedient]
 	and a
-	ld hl, Used2Text
-	ret nz
-	ld a, [wd11e]
-	cp 3
-	ld hl, Used2Text
-	ret c
-	ld hl, Used1Text
-	ret
-
-Used1Text: ; 3db2d (f:5b2d)
-	TX_FAR _Used1Text
-	TX_ASM
-	jr PrintInsteadText
-
-Used2Text: ; 3db34 (f:5b34)
-	TX_FAR _Used2Text
-	TX_ASM
-	; fall through
-
-PrintInsteadText: ; 3db39 (f:5b39)
-	ld a, [wMonIsDisobedient]
-	and a
-	jr z, PrintMoveName
+	ld hl, MoveNameWithExclamationText
+	ret z	
 	ld hl, InsteadText
 	ret
 
 InsteadText: ; 3db43 (f:5b43)
 	TX_FAR _InsteadText
-	TX_ASM
 	; fall through
 
-PrintMoveName: ; 3db48 (f:5b48)
-	ld hl, _PrintMoveName
-	ret
-
-_PrintMoveName: ; 3db4c (f:5b4c)
-	TX_FAR _CF4BText
-	TX_ASM
-	ld hl, ExclamationPointPointerTable
-	ld a, [wd11e] ; exclamation point num
-	add a
-	push bc
-	ld b, $0
-	ld c, a
-	add hl, bc
-	pop bc
-	ld a, [hli]
-	ld h, [hl]
-	ld l, a
-	ret
-
-ExclamationPointPointerTable: ; 3db62 (f:5b62)
-	dw ExclamationPoint1Text
-	dw ExclamationPoint2Text
-	dw ExclamationPoint3Text
-	dw ExclamationPoint4Text
-	dw ExclamationPoint5Text
-
-ExclamationPoint1Text: ; 3db6c (f:5b6c)
-	TX_FAR _ExclamationPoint1Text
+MoveNameWithExclamationText: ; 3db48 (f:5b48)
+	TX_FAR _MoveNameWithExclamationText
 	db "@"
-
-ExclamationPoint2Text: ; 3db71 (f:5b71)
-	TX_FAR _ExclamationPoint2Text
-	db "@"
-
-ExclamationPoint3Text: ; 3db76 (f:5b76)
-	TX_FAR _ExclamationPoint3Text
-	db "@"
-
-ExclamationPoint4Text: ; 3db7b (f:5b7b)
-	TX_FAR _ExclamationPoint4Text
-	db "@"
-
-ExclamationPoint5Text: ; 3db80 (f:5b80)
-	TX_FAR _ExclamationPoint5Text
-	db "@"
-
-; this function does nothing useful
-; if the move being used is in set [1-4] from ExclamationPointMoveSets,
-; use ExclamationPoint[1-4]Text
-; otherwise, use ExclamationPoint5Text
-; but all five text strings are identical
-; this likely had to do with Japanese grammar that got translated,
-; but the functionality didn't get removed
-DetermineExclamationPointTextNum: ; 3db85 (f:5b85)
-	push bc
-	ld a, [wd11e] ; move ID
-	ld c, a
-	ld b, $0
-	ld hl, ExclamationPointMoveSets
-.loop
-	ld a, [hli]
-	cp $ff
-	jr z, .done
-	cp c
-	jr z, .done
-	and a
-	jr nz, .loop
-	inc b
-	jr .loop
-.done
-	ld a, b
-	ld [wd11e], a ; exclamation point num
-	pop bc
-	ret
-
-ExclamationPointMoveSets: ; 3dba3 (f:5ba3)
-	db SWORDS_DANCE, GROWTH
-	db $00
-	db RECOVER, BIDE, SELFDESTRUCT, AMNESIA
-	db $00
-	db MEDITATE, AGILITY, TELEPORT, MIMIC, DOUBLE_TEAM, BARRAGE
-	db $00
-	db POUND, SCRATCH, VICEGRIP, WING_ATTACK, FLY, BIND, SLAM, HORN_ATTACK, BODY_SLAM
-	db WRAP, THRASH, TAIL_WHIP, LEER, BITE, GROWL, ROAR, SING, PECK, COUNTER
-	db STRENGTH, ABSORB, STRING_SHOT, EARTHQUAKE, FISSURE, DIG, TOXIC, SCREECH, HARDEN
-	db MINIMIZE, WITHDRAW, DEFENSE_CURL, METRONOME, LICK, CLAMP, CONSTRICT, POISON_GAS
-	db LEECH_LIFE, BUBBLE, FLASH, SPLASH, ACID_ARMOR, FURY_SWIPES, REST, SHARPEN, SLASH, SUBSTITUTE
-	db $00
-	db $FF ; terminator
 
 PrintMoveFailureText: ; 3dbe2 (f:5be2)
 	ld de, wPlayerMoveEffect
@@ -6375,9 +6447,14 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
 	ld a, [wIsInBattle]
 	cp $2 ; is it a trainer battle?
 ; fixed DVs for trainer mon
+	ld a, [wCurOpponent]
+	cp OPP_SONY3
 	ld a, $98
 	ld b, $88
-	jr z, .storeDVs
+	jr nz, .storeDVs
+	ld a, $ff
+	ld b, a
+	jr .storeDVs
 ; random DVs for wild mon
 	call BattleRandom
 	ld b, a
@@ -6518,7 +6595,10 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
 	ld [hli], a
 	dec b
 	jr nz, .statModLoop
-	ret
+	ld a, [wCurOpponent]
+	cp OPP_SONY3
+	ret nz
+	jp ApplyBadgeStatBoostsToChampion
 
 ; calls BattleTransition to show the battle transition animation and initializes some battle variables
 DoBattleTransitionAndInitBattleVariables: ; 3ec32 (f:6c32)
@@ -7906,6 +7986,14 @@ UpdateStatDone: ; 3f4ca (f:74ca)
 	and a
 	call z, ApplyBadgeStatBoosts ; whenever the player uses a stat-up move, badge boosts get reapplied again to every stat,
 	                             ; even to those not affected by the stat-up move (will be boosted further)
+	ld a, [wCurOpponent]
+	cp OPP_SONY3
+	jr nz, .notChampion
+	ld a, [H_WHOSETURN]
+	and a
+	jr z, .notChampion
+	call ApplyBadgeStatBoostsToChampion
+.notChampion
 	ld hl, MonsStatsRoseText
 	call PrintText
 

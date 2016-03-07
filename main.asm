@@ -3675,10 +3675,16 @@ _AddPartyMon: ; f2e5 (3:72e5)
 	push hl
 	ld a, [wMonDataLocation]
 	and $f
+	jr z, .playerParty
+	ld a, [wCurOpponent]
+	cp OPP_SONY3
 	ld a, $98     ; set enemy trainer mon IVs to fixed average values
 	ld b, $88
 	jr nz, .next4
-
+	ld a, $ff
+	ld b, a
+	jr .next4
+.playerParty
 ; If the mon is being added to the player's party, update the pokedex.
 	ld a, [wcf91]
 	ld [wd11e], a
@@ -5569,9 +5575,6 @@ TradingAnimationGraphics2:
 TradingAnimationGraphics2End:
 
 INCLUDE "engine/evos_moves.asm"
-INCLUDE "engine/battle/moveEffects/heal_effect.asm"
-INCLUDE "engine/battle/moveEffects/transform_effect.asm"
-INCLUDE "engine/battle/moveEffects/reflect_light_screen_effect.asm"
 
 
 SECTION "bankF",ROMX,BANK[$F]
@@ -5585,14 +5588,14 @@ INCLUDE "engine/menu/pokedex.asm"
 INCLUDE "engine/trade.asm"
 INCLUDE "engine/intro.asm"
 INCLUDE "engine/trade2.asm"
-
+INCLUDE "data/baseStats/montree.asm"
+INCLUDE "engine/multiply_divide.asm"
+INCLUDE "engine/battle/moveEffects/heal_effect.asm"
+INCLUDE "engine/battle/moveEffects/transform_effect.asm"
+INCLUDE "engine/battle/moveEffects/reflect_light_screen_effect.asm"
 ITFontGraphics:
 	ds $80 * $10
 ITFontGraphicsEnd:
-
-INCLUDE "data/baseStats/montree.asm"
-INCLUDE "engine/multiply_divide.asm"
-
 
 
 SECTION "bank11",ROMX,BANK[$11]
