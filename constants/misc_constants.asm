@@ -64,6 +64,7 @@ TWO_OPTION_MENU                   EQU $14
 BUY_SELL_QUIT_MENU                EQU $15
 JP_POKEDEX_MENU_TEMPLATE          EQU $1a
 SAFARI_BATTLE_MENU_TEMPLATE       EQU $1b
+CENA_BATTLE_MENU_TEMPLATE         EQU $1c
 
 ; two option menu constants
 YES_NO_MENU       EQU 0

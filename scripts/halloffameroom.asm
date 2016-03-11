@@ -15,11 +15,25 @@ HallofFameRoomScriptPointers: ; 5a4b2 (16:64b2)
 	dw HallofFameRoomScript1
 	dw HallofFameRoomScript2
 	dw HallofFameRoomScript3
-
-HallofFameRoomScript3: ; 5a4ba (16:64ba)
+    dw HallofFameRoomScript4
+    
+HallofFameRoomScript2:
+	ld a, $2
+	ld [hSpriteIndexOrTextID], a
+	call DisplayTextID
+    ld a, $ff
+	ld [wJoyIgnore], a
+	ld a, HS_UNKNOWN_DUNGEON_GUY
+	ld [wMissableObjectIndex], a
+	predef HideObject
+	ld a, $3
+	ld [wHallOfFameRoomCurScript], a
 	ret
 
-HallofFameRoomScript2: ; 5a4bb (16:64bb)
+HallofFameRoomScript4: ; 5a4ba (16:64ba)
+	ret
+
+HallofFameRoomScript3: ; 5a4bb (16:64bb)
 	call Delay3
 	ld a, [wLetterPrintingDelayFlags]
 	push af
@@ -89,21 +103,42 @@ HallofFameRoomScript1: ; 5a52b (16:652b)
 	ld [wJoyIgnore], a
 	inc a ; PLAYER_DIR_RIGHT
 	ld [wPlayerMovingDirection], a
-	ld a, $1
+    ld a, $1
 	ld [hSpriteIndexOrTextID], a
 	call DisplayTextID
-	ld a, $ff
-	ld [wJoyIgnore], a
-	ld a, HS_UNKNOWN_DUNGEON_GUY
-	ld [wMissableObjectIndex], a
-	predef HideObject
+    predef HealParty
+	ld hl, wd72d
+	set 6, [hl]
+	set 7, [hl]
+	ld hl, OakDefeatedText
+	ld de, OakVictoryText
+	call SaveEndBattleTextPointers
+	ld a, OPP_PROF_OAK
+	ld [wCurOpponent], a
+	ld a, 4
+	ld [wTrainerNo], a
+	xor a
+	ld [hJoyHeld], a
 	ld a, $2
 	ld [wHallOfFameRoomCurScript], a
 	ret
 
 HallofFameRoomTextPointers: ; 5a56a (16:656a)
 	dw HallofFameRoomText1
+    dw HallofFameRoomText2
 
 HallofFameRoomText1: ; 5a56c (16:656c)
 	TX_FAR _HallofFameRoomText1
+	db "@"
+    
+HallofFameRoomText2: ; 5a56c (16:656c)
+	TX_FAR _HallofFameRoomText2
+	db "@"
+
+OakDefeatedText: ; 760f9 (1d:60f9)
+	TX_FAR _OakDefeatedText
+	db "@"
+
+OakVictoryText: ; 760fe (1d:60fe)
+	TX_FAR _OakVictoryText
 	db "@"

@@ -469,7 +469,15 @@ MainInBattleLoop: ; 3c233 (f:4233)
 	ld a, [wActionResultOrTookBattleTurn]
 	and a ; has the player already used the turn (e.g. by using an item, trying to run or switching pokemon)
 	jr nz, .selectEnemyMove
-	ld [wMoveMenuType], a
+    ld a, [wCurOpponent]
+    cp a, OPP_PROF_OAK
+    jr nz, .doSelectMove
+    ld a, [wCenaBattleTurn]
+    cp $3
+    jr nc, .selectEnemyMove
+.doSelectMove
+    xor a
+    ld [wMoveMenuType], a
 	inc a
 	ld [wAnimationID], a
 	xor a
@@ -479,7 +487,7 @@ MainInBattleLoop: ; 3c233 (f:4233)
 	call LoadScreenTilesFromBuffer1
 	call DrawHUDsAndHPBars
 	pop af
-	jr nz, MainInBattleLoop ; if the player didn't select a move, jump
+	jp nz, MainInBattleLoop ; if the player didn't select a move, jump
 .selectEnemyMove
 	call SelectEnemyMove
 	ld a, [wLinkState]
@@ -517,6 +525,12 @@ MainInBattleLoop: ; 3c233 (f:4233)
 	ld a, $0
 	ld [wChampionSwappedOutToGolbat], a
 	jp nz, Champion_SendOutGolbatWithHaze
+	ld a, [wCurOpponent]
+    cp a, OPP_PROF_OAK
+    jr nz, .normalBattle
+    callab JohnCenaBattleTurnScript
+    jp MainInBattleLoop
+.normalBattle
 	ld a, [wChampionUsedXItem]
 	and a
 	jr nz, .AIActionUsedEnemyFirst
@@ -2369,9 +2383,20 @@ DisplayBattleMenu: ; 3ceb3 (f:4eb3)
 .nonstandardbattle
 	ld a, [wBattleType]
 	cp BATTLE_TYPE_SAFARI
+    jr nz, .secondcheck
+    ld a, SAFARI_BATTLE_MENU_TEMPLATE
+    jr .menuselected
+.secondcheck
+    ld a, [wCurOpponent]
+    cp a, OPP_PROF_OAK
+    jr nz, .normalmenu
+    ld a, [wCenaBattleTurn]
+    cp a, 3
+    jr c, .normalmenu
+    ld a, CENA_BATTLE_MENU_TEMPLATE
+    jr .menuselected
+.normalmenu
 	ld a, BATTLE_MENU_TEMPLATE
-	jr nz, .menuselected
-	ld a, SAFARI_BATTLE_MENU_TEMPLATE
 .menuselected
 	ld [wTextBoxID], a
 	call DisplayTextBoxID
@@ -2419,14 +2444,28 @@ DisplayBattleMenu: ; 3ceb3 (f:4eb3)
 .leftColumn ; put cursor in left column of menu
 	ld a, [wBattleType]
 	cp BATTLE_TYPE_SAFARI
-	ld a, " "
 	jr z, .safariLeftColumn
+    ld a, [wCurOpponent]
+    cp a, OPP_PROF_OAK
+    jr nz, .normalLeftColumn
+    ld a, [wCenaBattleTurn]
+    cp a, 3
+    jr c, .normalLeftColumn
+; put cursor in left column for cena battle menu   
+    ld a, " "
+    Coorda 13, 14 ; clear upper cursor position in right column
+	Coorda 13, 16 ; clear lower cursor position in right column
+	ld b, $7 ; top menu item X
+	jr .leftColumn_WaitForInput
 ; put cursor in left column for normal battle menu (i.e. when it's not a Safari battle)
+.normalLeftColumn
+    ld a, " "
 	Coorda 15, 14 ; clear upper cursor position in right column
 	Coorda 15, 16 ; clear lower cursor position in right column
 	ld b, $9 ; top menu item X
 	jr .leftColumn_WaitForInput
 .safariLeftColumn
+    ld a, " "
 	Coorda 13, 14
 	Coorda 13, 16
 	coord hl, 7, 14
@@ -2450,16 +2489,30 @@ DisplayBattleMenu: ; 3ceb3 (f:4eb3)
 	jr nz, .rightColumn
 	jr .AButtonPressed ; the A button was pressed
 .rightColumn ; put cursor in right column of menu
-	ld a, [wBattleType]
+    ld a, [wBattleType]
 	cp BATTLE_TYPE_SAFARI
-	ld a, " "
 	jr z, .safariRightColumn
+    ld a, [wCurOpponent]
+    cp a, OPP_PROF_OAK
+    jr nz, .normalRightColumn
+    ld a, [wCenaBattleTurn]
+    cp a, 3
+    jr c, .normalRightColumn
+; put cursor in right column for cena battle menu
+    ld a, " "
+    Coorda 7, 14 ; clear upper cursor position in right column
+	Coorda 7, 16 ; clear lower cursor position in right column
+	ld b, $d ; top menu item X
+	jr .rightColumn_WaitForInput
 ; put cursor in right column for normal battle menu (i.e. when it's not a Safari battle)
+.normalRightColumn
+    ld a, " "
 	Coorda 9, 14 ; clear upper cursor position in left column
 	Coorda 9, 16 ; clear lower cursor position in left column
 	ld b, $f ; top menu item X
 	jr .rightColumn_WaitForInput
 .safariRightColumn
+    ld a, " "
 	Coorda 1, 14 ; clear upper cursor position in left column
 	Coorda 1, 16 ; clear lower cursor position in left column
 	coord hl, 7, 14
@@ -2481,16 +2534,24 @@ DisplayBattleMenu: ; 3ceb3 (f:4eb3)
 	ld [hli], a ; wMenuWatchedKeys
 	call HandleMenuInput
 	bit 5, a ; check if left was pressed
-	jr nz, .leftColumn ; if left was pressed, jump
+	jp nz, .leftColumn ; if left was pressed, jump
 	ld a, [wCurrentMenuItem]
 	add $2 ; if we're in the right column, the actual id is +2
 	ld [wCurrentMenuItem], a
 .AButtonPressed
 	call PlaceUnfilledArrowMenuCursor
+    ld a, [wCurrentMenuItem]
+	ld [wBattleAndStartSavedMenuItem], a
+    ld a, [wCurOpponent]
+    cp OPP_PROF_OAK
+    jr nz, .notCena
+    ld a, [wCenaBattleTurn]
+    cp 3
+    jr nc, .fightMenuSelected
+.notCena
 	ld a, [wBattleType]
 	cp BATTLE_TYPE_SAFARI
 	ld a, [wCurrentMenuItem]
-	ld [wBattleAndStartSavedMenuItem], a
 	jr z, .handleMenuSelection
 ; not Safari battle
 ; swap the IDs of the item menu and party menu (this is probably because they swapped the positions
@@ -2513,6 +2574,7 @@ DisplayBattleMenu: ; 3ceb3 (f:4eb3)
 	cp BATTLE_TYPE_SAFARI
 	jr z, .throwSafariBallWasSelected
 ; the "FIGHT" menu was selected
+.fightMenuSelected
 	xor a
 	ld [wNumRunAttempts], a
 	jp LoadScreenTilesFromBuffer1 ; restore saved screen and return
@@ -7301,6 +7363,12 @@ InitWildBattle: ; 3ef8b (f:6f8b)
 	ld a, $1
 	ld [wInescapeableBattle], a
 .notYellowRaticate
+	ld a, [wCurOpponent]
+	cp OPP_PROF_OAK
+	jr nz, .notProfOak
+	ld a, $1
+	ld [wGiveExperience], a
+.notProfOak
 	ld de, vFrontPic
 	call LoadMonFrontSprite ; load mon sprite
 .spriteLoaded

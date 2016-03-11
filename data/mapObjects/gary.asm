@@ -9,10 +9,11 @@ GaryObject: ; 0x7612f (size=48)
 
 	db $0 ; signs
 
-	db $2 ; objects
-	object SPRITE_BLUE, $4, $2, STAY, DOWN, $1 ; person
+	db $2 ; $3 ; objects
+	object SPRITE_BLUE, $4, $2, STAY, LEFT, $1 ; person
 	object SPRITE_OAK, $3, $7, STAY, UP, $2 ; person
-
+	;object SPRITE_BLACK_HAIR_BOY_1, $3, $2, STAY, RIGHT, $3 ; person
+	
 	; warp-to
 	EVENT_DISP CHAMPIONS_ROOM_WIDTH, $7, $3 ; LANCES_ROOM
 	EVENT_DISP CHAMPIONS_ROOM_WIDTH, $7, $4 ; LANCES_ROOM

@@ -2047,6 +2047,7 @@ wSavedTilesetType:: ; d0d4
 	ds 1
 
 wChampionAICurScript:: ; d0d5
+wCenaBattleTurn::
 	ds 1
 	
 wChampionSwappedOutToGolbat:: ; d0d6

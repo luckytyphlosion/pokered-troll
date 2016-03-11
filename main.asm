@@ -1376,6 +1376,11 @@ TextBoxTextAndCoordTable: ; 73b0 (1:73b0)
 	db 11,8,19,17  ; text box coordinates
 	dw JapanesePokedexMenu
 	db 12,10 ; text coordinates
+	
+	db CENA_BATTLE_MENU_TEMPLATE
+	db 6,12,19,17  ; text box coordinates
+	dw CenaBattleMenuText
+	db 8,14 ; text coordinates
 
 ; note that there is no terminator
 
@@ -1427,6 +1432,10 @@ JapanesePokedexMenu: ; 74a1 (1:74a1)
 	next "なきごえ"
 	next "ぶんぷをみる"
 	next "キャンセル@"
+
+CenaBattleMenuText: ; 7455 (1:7455)
+	db   "FIGHT FIGHT"
+	next "FIGHT FIGHT@"
 
 DisplayMoneyBox: ; 74ba (1:74ba)
 	ld hl, wd730
@@ -5597,6 +5606,8 @@ ITFontGraphicsEnd:
 INCLUDE "engine/battle/print_type.asm"
 INCLUDE "engine/battle/save_trainer_name.asm"
 INCLUDE "engine/battle/moveEffects/focus_energy_effect.asm"
+INCLUDE "engine/battle/cena.asm"
+INCLUDE "engine/timer.asm"
 
 SECTION "bank11",ROMX,BANK[$11]
 

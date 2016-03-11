@@ -28,6 +28,8 @@ hSlideAmount EQU $FF8B
 
 hRLEByteValue EQU $FF8B
 
+hMonScrollIterNum EQU $FF8B
+
 H_SPRITEWIDTH            EQU $FF8B ; in tiles
 H_SPRITEINTERLACECOUNTER EQU $FF8B
 H_SPRITEHEIGHT           EQU $FF8C ; in tiles
@@ -299,6 +301,8 @@ hVendingMachinePrice EQU $FFDC ; 3-byte BCD number
 ; the first tile ID in a sequence of tile IDs that increase by 1 each step
 hStartTileID EQU $FFE1
 
+hBackupBank EQU $FFE2
+
 hNewPartyLength EQU $FFE4
 
 hDividend2 EQU $FFE5
@@ -323,3 +327,8 @@ hDisableJoypadPolling EQU $FFF9
 
 hJoyInput EQU $FFF8
 
+hCenaSoundEnabled EQU $FFFA
+
+hSoundBank EQU $FFFB
+
+hSoundAddr EQU $FFFC
