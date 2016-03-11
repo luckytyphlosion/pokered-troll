@@ -2056,7 +2056,10 @@ wChampionSwappedOutToGolbat:: ; d0d6
 wDamage:: ; d0d7
 	ds 2
 
-	ds 2
+wChampionPlayerSwappedOutOnGengar::
+	ds 1
+	
+	ds 1
 
 wRepelRemainingSteps:: ; d0db
 	ds 1

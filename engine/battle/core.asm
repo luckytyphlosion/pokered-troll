@@ -2775,7 +2775,7 @@ PartyMenuOrRockOrRun:
 SwitchPlayerMon: ; 3d1ba (f:51ba)
 	ld a, [wCurOpponent]
 	cp OPP_SONY3
-	jr nz, .notChampionNidoqueen
+	jr nz, .notChampionNidoqueenOrGengar
 	ld a, [wEnemyMonSpecies2]
 	cp NIDOQUEEN
 	jr nz, .notChampionNidoqueen
@@ -2784,6 +2784,11 @@ SwitchPlayerMon: ; 3d1ba (f:51ba)
 	or [hl]
 	jr z, .championNidoqueen
 .notChampionNidoqueen
+	cp GENGAR
+	jr nz, .notChampionNidoqueenOrGengar
+	ld a, $1
+	ld [wChampionPlayerSwappedOutOnGengar], a
+.notChampionNidoqueenOrGengar
 	callab RetreatMon
 .championNidoqueen
 	ld c, 50
@@ -3702,6 +3707,13 @@ ExecutePlayerMoveDone: ; 3d80a (f:580a)
 
 PrintGhostText: ; 3d811 (f:5811)
 ; print the ghost battle messages
+	ld a, [wCurOpponent]
+	cp OPP_SONY3
+	jr nz, .checkForGhostBattle
+	ld a, [wEnemyMonSpecies2]
+	cp GENGAR
+	jr z, .gengarSwitchOutTroll
+.checkForGhostBattle
 	call IsGhostBattle
 	ret nz
 	ld a,[H_WHOSETURN]
@@ -3716,9 +3728,24 @@ PrintGhostText: ; 3d811 (f:5811)
 	ret
 .Ghost ; ghost’s turn
 	ld hl,GetOutText
+.gotText
 	call PrintText
 	xor a
 	ret
+.gengarSwitchOutTroll
+	ld a, [wChampionPlayerSwappedOutOnGengar]
+	and a
+	ret nz
+	ld a, [H_WHOSETURN]
+	and a
+	ld hl, GengarSwitchOutText
+	jr nz, .gotText
+	ld hl, ScaredText
+	jr .gotText
+	
+GengarSwitchOutText:
+	TX_FAR _GengarSwitchOutText
+	db "@"
 
 ScaredText: ; 3d830 (f:5830)
 	TX_FAR _ScaredText

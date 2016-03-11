@@ -1267,22 +1267,8 @@ _TrickySentOutNidokingOhWaitText::
 	cont "..."
 	cont "..."
 	
-	para "."
-	cont ".."
-	cont "..."
-	cont "...."
-	cont "....."
-	cont "...."
-	cont "..."
-	cont ".."
-	cont ","
-	cont " "
-	cont ":("
-	
 	para "...Where is"
-	line "@"
-	TX_RAM wTrainerName
-	text "'s"
+	line $53, "'s"
 	cont "#MON?"
 	
 	para "..."
@@ -1368,6 +1354,13 @@ _GetOutText::
 	line "Get out..."
 	prompt
 
+_GengarSwitchOutText::
+	TX_RAM wEnemyMonNick
+	text ": Switch"
+	line "out..."
+	cont "Switch out..."
+	prompt
+	
 _FastAsleepText::
 	text $5A
 	line "is fast asleep!"

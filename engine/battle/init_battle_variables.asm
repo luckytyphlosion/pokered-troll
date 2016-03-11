@@ -19,6 +19,7 @@ InitBattleVariables: ; 525af (14:65af)
 	ld [wEscapedFromBattle], a
 	ld [wMapPalOffset], a
 	ld [wChampionAIClefableFirstTurn], a
+	ld [wChampionPlayerSwappedOutOnGengar], a
 	ld hl, wPlayerHPBarColor
 	ld [hli], a ; wPlayerHPBarColor
 	ld [hl], a ; wEnemyHPBarColor

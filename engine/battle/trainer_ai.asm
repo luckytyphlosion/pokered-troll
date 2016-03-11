@@ -290,7 +290,6 @@ AIMoveChoiceModification4: ; 39883 (e:5883)
 	ld a, [wEnemyMonPartyPos]
 	cp $3
 	jr c, .notNidoqueen
-	jr nz, .notNidoqueen
 	ld a, [wEnemyBattleStatus2]
 	bit UsingXAccuracy, a
 	jr z, .allowHealingItem
@@ -298,7 +297,6 @@ AIMoveChoiceModification4: ; 39883 (e:5883)
 	jp c, .doNotUseHealingItem
 	jr .allowHealingItem
 .notNidoqueen
-	
 	ld a, [wActionResultOrTookBattleTurn]
 	and a
 	jp z, .doNotUseHealingItem
@@ -1234,7 +1232,7 @@ TrainerAIPointers: ; 3a55c (e:655c)
 	dbw 1,SabrinaAI ; sabrina
 	dbw 3,GenericAI
 	dbw 1,Sony2AI ; sony2
-	dbw 1,Sony3AI ; sony3
+	dbw 1,GenericAI ; sony3
 	dbw 2,LoreleiAI ; lorelei
 	dbw 3,GenericAI
 	dbw 2,AgathaAI ; agatha
