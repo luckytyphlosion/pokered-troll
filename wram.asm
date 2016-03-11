@@ -1757,7 +1757,6 @@ wObjectToHide:: ; d079
 wObjectToShow:: ; d07a
 	ds 1
 
-wChampionUsedXItem::
 	ds 1
 
 wDefaultMap:: ; d07c
@@ -1782,7 +1781,10 @@ wSavedListScrollOffset:: ; d07e
 ; so that it can be restored when the player is done with the pokemart NPC
 	ds 1
 
-	ds 2
+wChampionUsedXItem::
+	ds 1
+
+	ds 1
 
 ; base coordinates of frame block
 wBaseCoordX:: ; d081
@@ -1886,6 +1888,7 @@ wSubAnimSubEntryAddr:: ; d096
 ; the address of the current subentry of the current subanimation
 	ds 2
 
+wSavedMonDVs::
 	ds 2
 
 wOutwardSpiralTileMapPointer:: ; d09a
@@ -3048,6 +3051,7 @@ wFlags_D733:: ; d733
 ; bit 2: skip the joypad check in CheckWarpsNoCollision (used for the forced warp down the waterfall in the Seafoam Islands)
 ; bit 3: trainer wants to battle
 ; bit 4: use variable [wCurMapScript] instead of the provided index for next frame's map script (used to start battle when talking to trainers)
+; bit 5: yellow gengar battle on champion
 ; bit 7: used fly out of battle
 	ds 1
 

@@ -127,6 +127,18 @@ PromptText:
 	prompt
 	
 PrintSendOutMonMessage: ; 58e59 (16:4e59)
+	ld a, [wCurOpponent]
+	cp OPP_SONY3
+	jr nz, .notChampionNidoqueen
+	ld a, [wEnemyMonSpecies2]
+	cp NIDOQUEEN
+	jr nz, .notChampionNidoqueen
+	ld hl, wEnemyMonHP
+	ld a, [hli]
+	or [hl]
+	ld hl, MonWasDraggedOutText
+	jr z, .printText
+.notChampionNidoqueen
 	ld hl, wEnemyMonHP
 	ld a, [hli]
 	or [hl]
@@ -192,6 +204,22 @@ PrintPlayerMon1Text:
 	ld hl, PlayerMon1Text
 	ret
 
+MonWasDraggedOutText:
+	TX_ASM
+	ld a, [H_WHOSETURN]
+	push af
+	xor a
+	ld [H_WHOSETURN], a
+	ld hl, MonWasDraggedOutText2
+	call PrintText
+	pop af
+	ld [H_WHOSETURN], a
+	jp TextScriptEnd
+
+MonWasDraggedOutText2:
+	TX_FAR _MonWasDraggedOutText
+	db "@"
+	
 PlayerMon1Text: ; 58ecc (16:4ecc)
 	TX_FAR _PlayerMon1Text
 	db "@"

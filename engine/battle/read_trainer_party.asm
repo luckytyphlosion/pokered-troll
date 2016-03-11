@@ -105,15 +105,24 @@ ReadTrainer: ; 39c53 (e:5c53)
 	ld bc, wPartyMon2 - wPartyMon1
 	ld hl, wPartyMon1
 	call AddNTimes
-	push hl
-	ld bc, wPartyMon1HPExp - wPartyMon1
+	ld b, h
+	ld c, l
+	
+	ld hl, wPartyMon1HPExp - wPartyMon1
 	add hl, bc
 	ld a, l
 	ld [wSavedPartyMonStatExpPtr], a
 	ld a, h
 	ld [wSavedPartyMonStatExpPtr + 1], a
-	pop hl
-	ld bc, wPartyMon1Level - wPartyMon1
+	
+	ld hl, wPartyMon1DVs - wPartyMon1
+	add hl, bc
+	ld a, [hli]
+	ld [wSavedMonDVs], a
+	ld a, [hl]
+	ld [wSavedMonDVs + 1], a
+	
+	ld hl, wPartyMon1Level - wPartyMon1
 	add hl, bc
 	ld b, [hl]
 	ld a, b
@@ -128,8 +137,10 @@ ReadTrainer: ; 39c53 (e:5c53)
 	ld c, a ; c = enemy level
 	ld a, b ; b = player level
 	cp 55 ; are we level 54 or lower?
-	jr c, .usePresetLevel ; if so, just use the default levels
 	ld a, c
+	jr c, .usePresetLevel ; if so, just use the default levels
+	cp 100
+	jr z, .usePresetLevel ; don't buff gengar
 	sub 55
 	add b ; calc enemy level - 55 + player level and use that as the new level
 .usePresetLevel

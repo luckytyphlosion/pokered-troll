@@ -1257,6 +1257,48 @@ _TrainerSentOutText::
 	text "!"
 	done
 
+_TrickySentOutNidokingOhWaitText::
+	TX_RAM wTrainerName
+	text " sent"
+	line "out NIDOKING!"
+	cont "..."
+	cont "..."
+	cont "..."
+	cont "..."
+	cont "..."
+	
+	para "."
+	cont ".."
+	cont "..."
+	cont "...."
+	cont "....."
+	cont "...."
+	cont "..."
+	cont ".."
+	cont ","
+	cont " "
+	cont ":("
+	
+	para "...Where is"
+	line "@"
+	TX_RAM wTrainerName
+	text "'s"
+	cont "#MON?"
+	
+	para "..."
+	
+	para "Ah, he found a"
+	line "replacement."
+	
+	para "@"
+	TX_RAM wTrainerName
+	text " sent"
+	line "out @"
+	TX_RAM wEnemyMonNick
+	text "!"
+	done
+	
+	
 _AgathaSentOutGolbatText::
 	text "AGATHA sent"
 	line "out TROLLBAT!"
@@ -1573,6 +1615,10 @@ _GhostCantBeIDdText::
 _ButNobodyCameText::
 	text "But nobody came@@"
 
+_MonWasDraggedOutText::
+	text $5a, " was"
+	line "dragged out!"
+	prompt
 	
 _GoText::
 	text "Go! @@"
@@ -2553,6 +2599,18 @@ _PokemonFaintedText::
 	line "fainted!"
 	done
 
+_NidoqueenShowedRedCardText::
+	text "Just before it"
+	line "fainted,"
+	cont "NIDOQUEEN"
+	cont "revealed a hidden"
+	cont "RED CARD!"
+	
+	para "It held it up"
+	line "against"
+	cont $5a, "!"
+	prompt
+	
 _PlayerBlackedOutText::
 	text $52, " is out of"
 	line "useable #MON!"

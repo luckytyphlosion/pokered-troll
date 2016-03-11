@@ -3681,8 +3681,10 @@ _AddPartyMon: ; f2e5 (3:72e5)
 	ld a, $98     ; set enemy trainer mon IVs to fixed average values
 	ld b, $88
 	jr nz, .next4
-	ld a, $ff
+	ld a, [wSavedMonDVs + 1]
 	ld b, a
+	ld a, [wSavedMonDVs]
+	swap a
 	jr .next4
 .playerParty
 ; If the mon is being added to the player's party, update the pokedex.
@@ -5246,12 +5248,7 @@ PinsirPicFront::      INCBIN "pic/bmon/pinsir.pic"
 PinsirPicBack::       INCBIN "pic/monback/pinsirb.pic"
 TangelaPicFront::     INCBIN "pic/bmon/tangela.pic"
 TangelaPicBack::      INCBIN "pic/monback/tangelab.pic"
-
-
-SECTION "Battle (bank 9)", ROMX, BANK[$9]
-INCLUDE "engine/battle/print_type.asm"
-INCLUDE "engine/battle/save_trainer_name.asm"
-INCLUDE "engine/battle/moveEffects/focus_energy_effect.asm"
+GengarPicYFront::     INCBIN "pic/ymon/gengar.pic"
 
 
 SECTION "Pics 2", ROMX, BANK[PICS_2]
@@ -5597,6 +5594,9 @@ ITFontGraphics:
 	ds $80 * $10
 ITFontGraphicsEnd:
 
+INCLUDE "engine/battle/print_type.asm"
+INCLUDE "engine/battle/save_trainer_name.asm"
+INCLUDE "engine/battle/moveEffects/focus_energy_effect.asm"
 
 SECTION "bank11",ROMX,BANK[$11]
 

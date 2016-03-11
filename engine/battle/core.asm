@@ -920,6 +920,21 @@ FaintEnemyPokemon: ; 0x3c567
 	ld hl, wPlayerUsedMove
 	ld [hli], a
 	ld [hl], a
+	ld a, [wCurOpponent]
+	cp OPP_SONY3
+	jr nz, .notChampionNidoqueen
+	ld a, [wEnemyMonSpecies2]
+	cp NIDOQUEEN
+	jr nz, .notChampionNidoqueen
+	ld a, [H_WHOSETURN]
+	push af
+	xor a
+	ld [H_WHOSETURN], a
+	ld hl, NidoqueenShowedRedCardText
+	call PrintText
+	pop af
+	ld [H_WHOSETURN], a
+.notChampionNidoqueen
 	coord hl, 12, 5
 	coord de, 12, 6
 	call SlideDownFaintedMonPic
@@ -963,6 +978,16 @@ FaintEnemyPokemon: ; 0x3c567
 	ld hl, EnemyMonFaintedText
 	call PrintText
 	call PrintEmptyString
+	ld a, [wCurOpponent]
+	cp OPP_SONY3
+	jr nz, .notChampionNidoqueen2
+	ld a, [wEnemyMonSpecies2]
+	cp NIDOQUEEN
+	jr nz, .notChampionNidoqueen2
+	ld a, [wPlayerMonNumber]
+	ld [wWhichPokemon], a
+	call SwitchPlayerMon
+.notChampionNidoqueen2
 	call SaveScreenTilesToBuffer1
 	xor a
 	ld [wBattleResult], a
@@ -1015,6 +1040,10 @@ EnemyMonFaintedText: ; 0x3c63e
 	TX_FAR _EnemyMonFaintedText
 	db "@"
 
+NidoqueenShowedRedCardText:
+	TX_FAR _NidoqueenShowedRedCardText
+	db "@"
+	
 EndLowHealthAlarm: ; 3c643 (f:4643)
 ; This function is called when the player has the won the battle. It turns off
 ; the low health alarm and prevents it from reactivating until the next battle.
@@ -1572,8 +1601,21 @@ EnemySendOutFirstMon: ; 3c92a (f:492a)
 	ld b, SET_PAL_BATTLE
 	call RunPaletteCommand
 	call GBPalNormal
+	ld a, [wCurOpponent]
+	cp OPP_SONY3
+	jr nz, .notChampionGengar
+	ld a, [wEnemyMonSpecies2]
+	cp GENGAR
+	jr nz, .notChampionGengar
+; troll message
+	ld hl, wFlags_D733
+	set 5, [hl]
+	ld hl, TrickySentOutNidokingOhWaitText
+	jr EnemySendOut_GotSendOutText
+.notChampionGengar
 Champion_SendOutGolbatWithHaze_AfterGolbatFaint:
 	ld hl,TrainerSentOutText
+EnemySendOut_GotSendOutText:
 	call PrintText
 	ld a,[wEnemyMonSpecies2]
 	ld [wcf91],a
@@ -1597,6 +1639,10 @@ Champion_SendOutGolbatWithHaze_AfterGolbatFaint:
 	call SaveScreenTilesToBuffer1
 	jp SwitchPlayerMon
 
+TrickySentOutNidokingOhWaitText:
+	TX_FAR _TrickySentOutNidokingOhWaitText
+	db "@"
+	
 Champion_SendOutGolbatWithHaze:
 	ld hl, AIBattleWithdrawText2
 	call PrintText
@@ -2727,7 +2773,19 @@ PartyMenuOrRockOrRun:
 ; fall through to SwitchPlayerMon
 
 SwitchPlayerMon: ; 3d1ba (f:51ba)
+	ld a, [wCurOpponent]
+	cp OPP_SONY3
+	jr nz, .notChampionNidoqueen
+	ld a, [wEnemyMonSpecies2]
+	cp NIDOQUEEN
+	jr nz, .notChampionNidoqueen
+	ld hl, wEnemyMonHP
+	ld a, [hli]
+	or [hl]
+	jr z, .championNidoqueen
+.notChampionNidoqueen
 	callab RetreatMon
+.championNidoqueen
 	ld c, 50
 	call DelayFrames
 	call AnimateRetreatingPlayerMon
@@ -6445,16 +6503,20 @@ LoadEnemyMonData: ; 3eb01 (f:6b01)
 	ld b, [hl]
 	jr nz, .storeDVs
 	ld a, [wIsInBattle]
-	cp $2 ; is it a trainer battle?
+	dec a
+	jr z, .randomDVs
 ; fixed DVs for trainer mon
 	ld a, [wCurOpponent]
 	cp OPP_SONY3
 	ld a, $98
 	ld b, $88
 	jr nz, .storeDVs
-	ld a, $ff
+	ld a, [wSavedMonDVs + 1]
 	ld b, a
+	ld a, [wSavedMonDVs]
+	swap a
 	jr .storeDVs
+.randomDVs
 ; random DVs for wild mon
 	call BattleRandom
 	ld b, a

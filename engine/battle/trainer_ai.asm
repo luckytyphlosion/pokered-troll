@@ -261,6 +261,13 @@ AIMoveChoiceModification3: ; 39817 (e:5817)
 
 AIMoveChoiceModification4: ; 39883 (e:5883)
 	ld a, [wEnemyMonPartyPos]
+	cp $5 ; position of gengar
+	jr nz, .notGengar
+	ld a, [wEnemyMonStatus]
+	and a
+	jp z, .doNotUseHealingItem
+	jp AIUseFullHeal
+.notGengar
 	cp $2 ; position of clefable
 	jr nz, .doNotUseHaze
 	ld a, [wChampionAIClefableFirstTurn]
@@ -282,14 +289,15 @@ AIMoveChoiceModification4: ; 39883 (e:5883)
 	
 	ld a, [wEnemyMonPartyPos]
 	cp $3
-	jr c, .notLastThreeMons
+	jr c, .notNidoqueen
+	jr nz, .notNidoqueen
 	ld a, [wEnemyBattleStatus2]
 	bit UsingXAccuracy, a
 	jr z, .allowHealingItem
 	call ComparePlayerAndEnemySpeed
 	jp c, .doNotUseHealingItem
 	jr .allowHealingItem
-.notLastThreeMons
+.notNidoqueen
 	
 	ld a, [wActionResultOrTookBattleTurn]
 	and a
@@ -382,7 +390,6 @@ AIMoveChoiceModification4: ; 39883 (e:5883)
 .canUseXItem
 	ld c, e
 	call ChampionTryUseStatUp
-.afterAttemptingToUseXSpeed
 	jr c, .afterSuccessfulItemUse
 .doNotUseHealingItem
 	ld a, [wEnemyMonPartyPos]
@@ -429,7 +436,7 @@ ChampionBattleIndividualMonAIs:
 	dw ChampAI_Clefable
 	dw ChampAI_Nidoqueen
 	dw ChampAI_Blastoise
-	dw ChampAI_Nidoking
+	dw ChampAI_Gengar
 	
 ChampAI_Charizard:
 	dw ChampAI_Charizard_SlashSpam
@@ -455,10 +462,8 @@ ChampAI_Blastoise:
 	dw ChampAI_Blastoise_UseXSpeed
 	dw ChampAI_Blastoise_MegaKick
 	
-ChampAI_Nidoking:
-	dw ChampAI_Nidoqueen_UseXSpeed
-	dw ChampAI_Nidoqueen_Thunderbolt
-	dw ChampAI_Nidoqueen_Earthquake
+ChampAI_Gengar:
+	dw ChampAI_Gengar_UseRandomMoves
 	
 ChampAI_EnemyUseXItemWeightingPointers:
 	dw ChampAI_XItem_Charizard
@@ -466,7 +471,7 @@ ChampAI_EnemyUseXItemWeightingPointers:
 	dw ChampAI_XItem_Clefable
 	dw ChampAI_XItem_Nidoqueen
 	dw ChampAI_XItem_Blastoise
-	dw ChampAI_XItem_Nidoking
+	dw ChampAI_XItem_Gengar
 	
 ChampAI_XItem_Charizard:
 	weighstats 0, 0, 0, 0
@@ -481,10 +486,10 @@ ChampAI_XItem_Clefable:
 	weighstats 0, 0, 0, 0
 	weighstats ATK, SPC, SPD, DFN
 	weighstats SPC, SPD, ATK, DFN
+ChampAI_XItem_Gengar:
 	weighstats 0, 0, 0, 0
 	
 ChampAI_XItem_Nidoqueen:
-ChampAI_XItem_Nidoking:
 	weighstats SPD, SPC, ATK, DFN
 	weighstats SPC, SPD, ATK, DFN
 	weighstats ATK, SPC, SPD, DFN
@@ -579,8 +584,11 @@ ChampAI_Nidoqueen_UseXSpeed:
 	call ComparePlayerAndEnemySpeed
 	jr c, .checkForXAccuracy
 	call ComparePlayerAndEnemySpeed_EnemyHasSpeedBoost
-	jp c, AIUseXSpeed
-	
+	jr nc, .doNotTryUsingXSpeed
+	ld c, SPD
+	call ChampionTryUseStatUp
+	ret c
+.doNotTryUsingXSpeed
 	dmgcmpstats ATK, 1, SPC, 1
 	lb de, EARTHQUAKE, THUNDERBOLT
 	call CompareDamageBetweenTwoMoves
@@ -677,7 +685,11 @@ ChampAI_Blastoise_UseXSpeed:
 	call ComparePlayerAndEnemySpeed
 	jp c, ChampAI_ChooseMove4
 	call ComparePlayerAndEnemySpeed_EnemyHasSpeedBoost
-	jp c, AIUseXSpeed
+	jr nc, .doNotUseXSpeed
+	ld c, SPD
+	call ChampionTryUseStatUp
+	ret c
+.doNotUseXSpeed
 	
 	ld a, $2
 	ld [wChampionAICurScript], a
@@ -731,6 +743,10 @@ ChampAI_Blastoise_MegaKick:
 	ld a, $1
 	ld [wChampionAICurScript], a
 	scf
+	ret
+	
+ChampAI_Gengar_UseRandomMoves:
+	and a
 	ret
 	
 CompareDamageBetweenBodySlamAndThunderbolt_NoStatModifying:
@@ -1032,6 +1048,7 @@ StatModifierProbabilityTable:
 	db 51
 	db 42
 	db 36
+	db 31
 	
 ScaleBCAndDEBy4IfEither16Bit:
 	ld a, b

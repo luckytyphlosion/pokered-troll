@@ -100,7 +100,7 @@ UsedCut: ; ef54 (3:6f54)
 	ld [wWhichCeladonGymTree], a
 	ld a, MON_TREE
 	ld [wCurOpponent], a
-	ld a, 30
+	ld a, 20
 	ld [wCurEnemyLVL], a
 	ld a, $4
 	ld [wCeladonGymCurScript], a

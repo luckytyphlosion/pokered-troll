@@ -594,11 +594,24 @@ GetMonHeader:: ; 1537 (0:1537)
 	ld hl, wd732
 	bit 7, [hl]
 	res 7, [hl]
+	jr nz, .yellowRaticate
+	inc hl ; ld hl, wFlags_D733
+	bit 5, [hl]
+	res 5, [hl]
 	jr z, .done
+; if gengar
+	ld a, $77
+	ld [wMonHSpriteDim], a
+	ld a, GengarPicYFront & $ff
+	ld [wMonHFrontSprite], a
+	ld a, GengarPicYFront / $100
+	jr .writeUpperByteOfFrontSprite
 ; if raticate
+.yellowRaticate
 	ld a, RaticateYPicFront & $ff
 	ld [wMonHFrontSprite], a
 	ld a, RaticateYPicFront / $100
+.writeUpperByteOfFrontSprite
 	ld [wMonHFrontSprite + 1], a
 	jr .done
 .specialID
