@@ -2298,7 +2298,7 @@ const_value = 0
 	const EVENT_8F7                                  ; 8F7, (D865, bit 7)
 	const EVENT_8F8                                  ; 8F8, (D866, bit 0)
 	const EVENT_BEAT_LANCES_ROOM_TRAINER_0           ; 8F9, (D866, bit 1)
-	const EVENT_8FA                                  ; 8FA, (D866, bit 2)
+	const EVENT_UNLOCKED_LANCE_SHOP                  ; 8FA, (D866, bit 2)
 	const EVENT_8FB                                  ; 8FB, (D866, bit 3)
 	const EVENT_8FC                                  ; 8FC, (D866, bit 4)
 	const EVENT_8FD                                  ; 8FD, (D866, bit 5)

@@ -62,3 +62,13 @@ _LanceAfterBattleText::
 	line "#MON LEAGUE"
 	cont "champion!@@"
 
+_LanceText2::
+	text "You seem to be"
+	line "having trouble"
+	cont "beating the new"
+	cont "CHAMPION."
+	
+	para "Maybe my SHOP"
+	line "will help you out."
+	done
+	

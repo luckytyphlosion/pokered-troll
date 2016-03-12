@@ -1,4 +1,5 @@
 LanceScript: ; 5a2ae (16:62ae)
+	call LanceCheckForChampResets
 	call LanceShowOrHideEntranceBlocks
 	call EnableAutoTextBoxDrawing
 	ld hl, LanceTrainerHeaders
@@ -8,6 +9,40 @@ LanceScript: ; 5a2ae (16:62ae)
 	ld [wLanceCurScript], a
 	ret
 
+
+	
+LanceCheckForChampResets:
+	ld hl, wCurrentMapScriptFlags
+	bit 5, [hl]
+	ret z
+	
+	ld a, SRAM_ENABLE
+	ld [MBC1SRamEnable], a
+	ld a, $1
+	ld [MBC1SRamBankingMode], a
+	ld [MBC1SRamBank], a
+	ld a, [sNumChampionAttempts]
+	ld b, a
+	xor a
+	ld [MBC1SRamEnable], a
+	ld [MBC1SRamBankingMode], a
+	ld [MBC1SRamBank], a
+	
+	ld a, b
+	cp $3
+	ret c
+	
+	SetEvent EVENT_UNLOCKED_LANCE_SHOP
+	
+	cp $4
+	ret nc
+	
+	ld a, $2
+	ld [hSpriteIndexOrTextID], a
+	jp DisplayTextID
+	
+	
+	
 LanceShowOrHideEntranceBlocks: ; 5a2c4 (16:62c4)
 	ld hl, wCurrentMapScriptFlags
 	bit 5, [hl]
@@ -129,6 +164,8 @@ LanceScript3: ; 5a382 (16:6382)
 
 LanceTextPointers: ; 5a395 (16:6395)
 	dw LanceText1
+	dw LanceText2
+	dw LanceShopText
 
 LanceTrainerHeaders: ; 5a397 (16:6397)
 LanceTrainerHeader0: ; 5a397 (16:6397)
@@ -144,9 +181,21 @@ LanceTrainerHeader0: ; 5a397 (16:6397)
 
 LanceText1: ; 5a3a4 (16:63a4)
 	TX_ASM
+	CheckEvent EVENT_UNLOCKED_LANCE_SHOP
+	jr z, .talkToLance
+	ld a, $3
+	ld [hSpriteIndexOrTextID], a
+	call DisplayTextID
+	jr .textScriptEnd
+.talkToLance
 	ld hl, LanceTrainerHeader0
 	call TalkToTrainer
+.textScriptEnd
 	jp TextScriptEnd
+
+LanceText2:
+	TX_FAR _LanceText2
+	db "@"
 
 LanceBeforeBattleText: ; 5a3ae (16:63ae)
 	TX_FAR _LanceBeforeBattleText

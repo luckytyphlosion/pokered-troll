@@ -67,12 +67,32 @@ GaryScript2: ; 75f6a (1d:5f6a)
 	ld a, $1
 	ld [wTrainerNo], a
 
+	call GaryScript_WriteNumAttemptsInSRAM
+	
 	xor a
 	ld [hJoyHeld], a
 	ld a, $3
 	ld [wGaryCurScript], a
 	ret
 
+GaryScript_WriteNumAttemptsInSRAM:
+	ld a, SRAM_ENABLE
+	ld [MBC1SRamEnable], a
+	ld a, $1
+	ld [MBC1SRamBankingMode], a
+	ld [MBC1SRamBank], a
+	ld a, [sNumChampionAttempts]
+	inc a
+	cp $4
+	jr nc, .done
+	ld [sNumChampionAttempts], a
+.done
+	xor a
+	ld [MBC1SRamEnable], a
+	ld [MBC1SRamBankingMode], a
+	ld [MBC1SRamBank], a
+	ret
+	
 GaryScript_DoGiantConversation2:
 	ld hl, GaryScript_SpriteTurnData2
 	lb bc, 16, 22

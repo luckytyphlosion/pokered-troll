@@ -700,6 +700,7 @@ CheckForPlayerNameInSRAM: ; 609e (1:609e)
 	jr nz, .loop
 ; not found
 	xor a
+	ld [sNumChampionAttempts], a
 	ld [MBC1SRamEnable], a
 	ld [MBC1SRamBankingMode], a
 	and a
