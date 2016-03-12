@@ -144,6 +144,9 @@ PlaySound:: ; 23b1 (0:23b1)
 	push de
 	push bc
 	ld b, a
+	ld a, [hCenaSoundEnabled]
+	and a
+	jr nz, .done
 	ld a, [wNewSoundID]
 	and a
 	jr z, .next

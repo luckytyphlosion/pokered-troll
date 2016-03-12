@@ -553,7 +553,7 @@ JCReadyText:
     
 JCCantSeeMeText:
     text "CHAMP used"
-    line "YOU CAN'T SEE ME!"
+    line "U CANT C ME!"
     done
     
 JCConfusedText:
@@ -596,7 +596,9 @@ rept NUM_MOVES
 endr
 
 JCSoundSetup:
-	ret
+	ld a, $ff
+	call PlaySound
+	
 	ld			a,$8f
 	ldh			[rNR52],a					
 	ld			a,$77
@@ -626,6 +628,7 @@ JCSoundSetup:
 	ldh			[hSoundAddr],a
 	ld			a,$40
 	ldh			[hSoundAddr+1],a
+	
     ld a, $1
     ld [hCenaSoundEnabled], a
 

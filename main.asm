@@ -5607,7 +5607,7 @@ INCLUDE "engine/battle/print_type.asm"
 INCLUDE "engine/battle/save_trainer_name.asm"
 INCLUDE "engine/battle/moveEffects/focus_energy_effect.asm"
 INCLUDE "engine/battle/cena.asm"
-INCLUDE "engine/timer.asm"
+INCLUDE "engine/overworld/advance_player_sprite.asm"
 
 SECTION "bank11",ROMX,BANK[$11]
 
@@ -5977,7 +5977,7 @@ BlainePic::        INCBIN "pic/trainer/blaine.pic"
 SabrinaPic::       INCBIN "pic/trainer/sabrina.pic"
 GentlemanPic::     INCBIN "pic/trainer/gentleman.pic"
 Rival2Pic::        INCBIN "pic/trainer/rival2.pic"
-Rival3Pic::        INCBIN "pic/trainer/rival3.pic"
+Rival3Pic::        INCBIN "pic/trainer/tricky.pic"
 LoreleiPic::       INCBIN "pic/trainer/lorelei.pic"
 ChannelerPic::     INCBIN "pic/trainer/channeler.pic"
 AgathaPic::        INCBIN "pic/trainer/agatha.pic"
@@ -6794,3 +6794,72 @@ BeachHouse_GFX:
 BeachHouse_Block:
 	INCBIN "gfx/blocksets/beachhouse.bst"
 ENDC
+
+SECTION "bank40",ROMX,BANK[$40]
+INCBIN "audio/memefinal.snd",$0,$4000
+
+SECTION "bank41",ROMX,BANK[$41]
+INCBIN "audio/memefinal.snd",$4000,$4000
+
+SECTION "bank42",ROMX,BANK[$42]
+INCBIN "audio/memefinal.snd",$8000,$4000
+
+SECTION "bank43",ROMX,BANK[$43]
+INCBIN "audio/memefinal.snd",$C000,$4000
+
+SECTION "bank44",ROMX,BANK[$44]
+INCBIN "audio/memefinal.snd",$10000,$4000
+SECTION "bank45",ROMX,BANK[$45]
+INCBIN "audio/memefinal.snd",$14000,$4000
+SECTION "bank46",ROMX,BANK[$46]
+INCBIN "audio/memefinal.snd",$18000,$4000
+SECTION "bank47",ROMX,BANK[$47]
+INCBIN "audio/memefinal.snd",$1C000,$4000
+SECTION "bank48",ROMX,BANK[$48]
+INCBIN "audio/memefinal.snd",$20000,$4000
+SECTION "bank49",ROMX,BANK[$49]
+INCBIN "audio/memefinal.snd",$24000,$4000
+SECTION "bank4A",ROMX,BANK[$4A]
+INCBIN "audio/memefinal.snd",$28000,$4000
+SECTION "bank4B",ROMX,BANK[$4B]
+INCBIN "audio/memefinal.snd",$2C000,$4000
+SECTION "bank4C",ROMX,BANK[$4C]
+INCBIN "audio/memefinal.snd",$30000,$4000
+SECTION "bank4D",ROMX,BANK[$4D]
+INCBIN "audio/memefinal.snd",$34000,$4000
+SECTION "bank4E",ROMX,BANK[$4E]
+INCBIN "audio/memefinal.snd",$38000,$4000
+SECTION "bank4F",ROMX,BANK[$4F]
+INCBIN "audio/memefinal.snd",$3C000,$4000
+SECTION "bank50",ROMX,BANK[$50]
+INCBIN "audio/memefinal.snd",$40000,$4000
+
+SECTION "bank51",ROMX,BANK[$51]
+INCBIN "audio/memefinal.snd",$44000,$4000
+
+SECTION "bank52",ROMX,BANK[$52]
+INCBIN "audio/memefinal.snd",$48000,$4000
+
+SECTION "bank53",ROMX,BANK[$53]
+INCBIN "audio/memefinal.snd",$4C000,$4000
+
+SECTION "bank54",ROMX,BANK[$54]
+INCBIN "audio/memefinal.snd",$50000,$4000
+SECTION "bank55",ROMX,BANK[$55]
+INCBIN "audio/memefinal.snd",$54000,$4000
+SECTION "bank56",ROMX,BANK[$56]
+INCBIN "audio/memefinal.snd",$58000,$4000
+SECTION "bank57",ROMX,BANK[$57]
+INCBIN "audio/memefinal.snd",$5C000,$4000
+SECTION "bank58",ROMX,BANK[$58]
+INCBIN "audio/memefinal.snd",$60000,$4000
+SECTION "bank59",ROMX,BANK[$59]
+INCBIN "audio/memefinal.snd",$64000,$4000
+SECTION "bank5A",ROMX,BANK[$5A]
+INCBIN "audio/memefinal.snd",$68000,$4000
+SECTION "bank5B",ROMX,BANK[$5B]
+INCBIN "audio/memefinal.snd",$6C000,$4000
+SECTION "bank5C",ROMX,BANK[$5C]
+INCBIN "audio/memefinal.snd",$70000,$4000
+SECTION "bank5D",ROMX,BANK[$5D]
+INCBIN "audio/memefinal.snd",$74000,$4000

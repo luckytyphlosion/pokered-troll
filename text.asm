@@ -1268,7 +1268,7 @@ _TrickySentOutNidokingOhWaitText::
 	cont "..."
 	
 	para "...Where is"
-	line $53, "'s"
+	line "TRICKY's"
 	cont "#MON?"
 	
 	para "..."

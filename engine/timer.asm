@@ -67,6 +67,12 @@ _Timer:
 .incbank:
     ld          hl,hSoundBank
     inc         [hl]
+	ld a, [hl]
+	cp $5e
+	jr nz, .noRepeat
+	ld a, $40
+	ld [hl], a
+.noRepeat
     xor         a
     ldh         [hSoundAddr+0],a
     ld          a,$40

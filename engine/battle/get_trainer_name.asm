@@ -10,6 +10,7 @@ GetTrainerName_: ; 13a58 (4:7a58)
 	cp SONY2
 	jr z, .rival
 	cp SONY3
+	ld hl, TrickyString
 	jr z, .rival
 	ld [wd0b5], a
 	ld a, TRAINER_NAME
@@ -22,3 +23,6 @@ GetTrainerName_: ; 13a58 (4:7a58)
 	ld de, wTrainerName
 	ld bc, $d
 	jp CopyData
+
+TrickyString:
+	db "EXTRATRICKY@"
