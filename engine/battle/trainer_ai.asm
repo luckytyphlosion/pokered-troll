@@ -289,7 +289,7 @@ AIMoveChoiceModification4: ; 39883 (e:5883)
 	
 	ld a, [wEnemyMonPartyPos]
 	cp $3
-	jr c, .notNidoqueen
+	jr nz, .notNidoqueen
 	ld a, [wEnemyBattleStatus2]
 	bit UsingXAccuracy, a
 	jr z, .allowHealingItem
