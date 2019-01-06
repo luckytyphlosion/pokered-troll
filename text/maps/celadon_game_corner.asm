@@ -179,6 +179,22 @@ _CeladonGameCornerText_48f09::
 	para "A switch behind"
 	line "the poster!?"
 	cont "Let's push it!@@"
+    
+_CeladonGameCornerWarningText::
+    text "..."
+    para "..."
+    para "There's something"
+    line "else written on"
+    cont "the poster..."
+    para "NOTICE! New"
+    line "recruits should"
+    cont "heal their"
+    cont "#MON at a"
+    cont "#MON CENTER"
+    cont "before coming in."
+    para "You have been"
+    line "warned!"
+    done
 
 _CeladonGameCornerText_48f19::
 	text "Oops! Forgot the"

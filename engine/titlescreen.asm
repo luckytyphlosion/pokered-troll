@@ -118,7 +118,7 @@ DisplayTitleScreen: ; 42dd (1:42dd)
 	call LoadScreenTilesFromBuffer2
 	call EnableLCD
 IF DEF(_RED)
-	ld a,CHARMANDER ; which Pokemon to show first on the title screen
+	ld a,MON_KAPPA ; which Pokemon to show first on the title screen
 ENDC
 IF DEF(_BLUE)
 	ld a,SQUIRTLE ; which Pokemon to show first on the title screen
@@ -231,8 +231,13 @@ ENDC
 	jr .awaitUserInterruptionLoop
 
 .finishedWaiting
-	ld a, [wTitleMonSpecies]
-	call PlayCry
+    call Random
+    ld [wFrequencyModifier], a
+    ld a, $FF
+    ld [wTempoModifier], a
+    ld a, $3B ; jynx's raw cry
+	;ld a, [wTitleMonSpecies]
+	call PlaySound
 	call WaitForSoundToFinish
 	call GBPalWhiteOutWithDelay3
 	call ClearSprites

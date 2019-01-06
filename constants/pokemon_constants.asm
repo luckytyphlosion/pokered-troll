@@ -190,3 +190,10 @@ const_value = 1
 	const BELLSPROUT   ; $BC
 	const WEEPINBELL   ; $BD
 	const VICTREEBEL   ; $BE
+    const MON_KAPPA ; $BF
+    const MON_DANSGAME
+    const MON_WUTFACE
+    const MON_KEEPO
+    const MON_PJSALT
+    const MON_OPIEOP
+    const MON_KEIZARAGE

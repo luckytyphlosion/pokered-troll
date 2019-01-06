@@ -143,6 +143,10 @@ ReadTrainer: ; 39c53 (e:5c53)
 	jr z, .usePresetLevel ; don't buff gengar
 	sub 55
 	add b ; calc enemy level - 55 + player level and use that as the new level
+    ; uncomment the following fix if we start changing things
+    ;cp 101
+    ;jr nc, .usePresetLevel
+    ;ld a, 100 ; let oak be the cheater, not tricky
 .usePresetLevel
 	ld [wCurEnemyLVL],a
 	ld a,[hli]

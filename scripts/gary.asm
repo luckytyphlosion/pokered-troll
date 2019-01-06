@@ -83,7 +83,7 @@ GaryScript_WriteNumAttemptsInSRAM:
 	ld [MBC1SRamBank], a
 	ld a, [sNumChampionAttempts]
 	inc a
-	cp $4
+	cp $5
 	jr nc, .done
 	ld [sNumChampionAttempts], a
 .done
@@ -99,8 +99,31 @@ GaryScript_DoGiantConversation2:
 	jr GaryScript_ConversationContinue
 	
 GaryScript_DoGiantConversation1:
+    ld a, SRAM_ENABLE
+	ld [MBC1SRamEnable], a
+	ld a, $1
+	ld [MBC1SRamBankingMode], a
+	ld [MBC1SRamBank], a
+	ld a, [sNumChampionAttempts]
+    ld b, a
+    xor a
+	ld [MBC1SRamEnable], a
+	ld [MBC1SRamBankingMode], a
+	ld [MBC1SRamBank], a
+    ld a, b
+    and a
+    jr nz, .abbreviated
 	ld hl, GaryScript_SpriteTurnData1
 	lb bc, 1, 14
+    jr GaryScript_ConversationContinue
+.abbreviated
+    ld a, 3
+	ld [H_SPRITEINDEX], a
+	ld a, SPRITE_FACING_DOWN
+	ld [hSpriteFacingDirection], a
+    call SetSpriteFacingDirectionAndDelay
+    ld hl, GaryScript_SpriteTurnData3
+    lb bc, 22, 23
 GaryScript_ConversationContinue:
 	ld a, $f0
 	ld [wJoyIgnore], a
@@ -151,6 +174,7 @@ GaryScript_SpriteTurnData1:
 	db $1, SPRITE_FACING_DOWN
 	db $3, SPRITE_FACING_RIGHT
 	db $3, SPRITE_FACING_DOWN
+GaryScript_SpriteTurnData3:
 	db $3, SPRITE_FACING_DOWN
 	
 	db 0, 0
@@ -321,6 +345,7 @@ GaryTextPointers: ; 760d6 (1d:60d6)
 	dw GaryTextTrickyWhat
 	dw GaryText_JustKidding
 	dw GaryText_CongratulatePlayer
+    dw GaryTextHereAgain
 	
 GaryTextLostToTricky: ; 760e0 (1d:60e0)
 	TX_FAR _GaryTextLostToTricky
@@ -418,3 +443,7 @@ GaryText_JustKidding:
 GaryText_CongratulatePlayer:
 	TX_FAR _GaryText_CongratulatePlayer
 	db "@"
+
+GaryTextHereAgain
+    TX_FAR _GaryTextHereAgain
+    db "@"

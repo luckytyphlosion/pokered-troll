@@ -63,10 +63,10 @@ _LanceAfterBattleText::
 	cont "champion!@@"
 
 _LanceText2::
-	text "You seem to be"
-	line "having trouble"
-	cont "beating the new"
-	cont "CHAMPION."
+	text "LANCE: You seem"
+	line "to be having"
+	cont "trouble beating"
+	cont "the new CHAMPION."
 	
 	para "Maybe my SHOP"
 	line "will help you out."

@@ -3,7 +3,17 @@ CENA_POKEMON EQU MACHOKE
 JohnCenaBattleTurnScript:: ; 3b:4000
     ld hl, wOptions
     res 7, [hl] ; animations forced on
+    ld a, [wEnemyMonStatus]
+    and a
+    jr z, .normalTurn
+    callab AIUseFullRestore
+    callab DrawHUDsAndHPBars
+    ld a, [wCenaBattleTurn]
+    cp a, 3
+    jr nc, .normalTurn
+    jpab ExecutePlayerMove
 ; script the battle depending on CenaTurn
+.normalTurn
     ld a, [wCenaBattleTurn]
     and a, $0F
     add a, a
@@ -12,10 +22,8 @@ JohnCenaBattleTurnScript:: ; 3b:4000
     ld hl, CenaTurnsJumpTable
     add hl, bc
     ld a, [hli]
-    ld b, a
-    ld a, [hl]
-    ld l, b
-    ld h, a
+    ld h, [hl]
+    ld l, a
     call CallHL
     ld a, [wCenaBattleTurn]
     inc a
@@ -38,6 +46,8 @@ rept 9
 endr
     
 FirstTurnTbolt:
+    ld a, 1
+    ld [wGiveExperience], a
     ld hl,JCTboltText
     call PrintText
     call Delay3
@@ -297,6 +307,19 @@ SeventhTurnDed:
     ld [hCenaSoundEnabled], a
     ret
     
+CenaItemTroll:
+    call ClearEnemyArea
+    callab _ScrollTrainerPicAfterBattle
+    ld hl,JCNoItemsText
+    call PrintText
+    call Delay3
+    ld a, 8
+    coord hl, 18, 0
+    call SlideTrainerPicOffScreenCena
+    call ClearEnemyArea
+    ld a, MEWTWO
+    jp ScrollMonPic
+    
     
 CenaNop:
     ret
@@ -553,7 +576,7 @@ JCReadyText:
     
 JCCantSeeMeText:
     text "CHAMP used"
-    line "U CANT C ME!"
+    line "U CAN'T C ME!"
     done
     
 JCConfusedText:
@@ -571,6 +594,10 @@ JCObliteratedText:
     text "Foe MEWTWO was"
     line "utterly destroyed!"
     done
+    
+JCNoItemsText:
+	TX_FAR _ItemUseNotTimeText
+	db "@"
     
 JCChampHeader:
     db "CHAMP@@@@@@"

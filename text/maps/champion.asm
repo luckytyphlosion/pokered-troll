@@ -171,6 +171,21 @@ _GaryTextDoBattleNow::
 	
 	para "Try and beat me!"
 	done
+    
+_GaryTextHereAgain::
+	text "TRICKY: Back for"
+	line "more, ",$52,"?"
+    
+    para "You should see"
+    line "by now that my"
+    cont "words were true:"
+	
+	para "I'm not going"
+	line "down without a"
+	cont "fight!"
+	
+	para "Try and beat me!"
+	done
 	
 _GaryTextTrickyDefeated::
 	text "Whew,"

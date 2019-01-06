@@ -271,25 +271,28 @@ LoadFlippedFrontSpriteByMonIndex:: ; 1384 (0:1384)
 	ld [wSpriteFlipped], a
 
 LoadFrontSpriteByMonIndex:: ; 1389 (0:1389)
-	push hl
-	ld a, [wd11e]
-	push af
-	ld a, [wcf91]
-	ld [wd11e], a
-	predef IndexToPokedex
-	ld hl, wd11e
-	ld a, [hl]
-	pop bc
-	ld [hl], b
-	and a
-	pop hl
-	jr z, .invalidDexNumber ; dex #0 invalid
-	cp NUM_POKEMON + 1
-	jr c, .validDexNumber   ; dex >#151 invalid
+; DABOMSTEW: this error checking appears to be 100% unnecessary if we're only making the ROM for glitchless
+; honestly not sure why it's even here in vanilla
+; in any case I need it gone for titleemotes soo
+	;push hl
+	;ld a, [wd11e]
+	;push af
+	;ld a, [wcf91]
+	;ld [wd11e], a
+	;predef IndexToPokedex
+	;ld hl, wd11e
+	;ld a, [hl]
+	;pop bc
+	;ld [hl], b
+	;and a
+	;pop hl
+	;jr z, .invalidDexNumber ; dex #0 invalid
+	;cp NUM_POKEMON + 1
+	;jr c, .validDexNumber   ; dex >#151 invalid
 .invalidDexNumber
-	ld a, RHYDON ; $1
-	ld [wcf91], a
-	ret
+	;ld a, RHYDON ; $1
+	;ld [wcf91], a
+	;ret
 .validDexNumber
 	push hl
 	ld de, vFrontPic
@@ -542,15 +545,6 @@ PrintLevelCommon:: ; 1523 (0:1523)
 	ld b,LEFT_ALIGN | 1 ; 1 byte
 	jp PrintNumber
 
-GetwMoves:: ; 152e (0:152e)
-; Unused. Returns the move at index a from wMoves in a
-	ld hl,wMoves
-	ld c,a
-	ld b,0
-	add hl,bc
-	ld a,[hl]
-	ret
-
 ; copies the base stat data of a pokemon to wMonHeader
 ; INPUT:
 ; [wd0b5] = pokemon ID
@@ -578,6 +572,8 @@ GetMonHeader:: ; 1537 (0:1537)
 	ld b,$77 ; size of Aerodactyl fossil sprite
 	cp a,FOSSIL_AERODACTYL ; Aerodactyl fossil
 	jr z,.specialID
+    cp a,MON_KAPPA
+    jr nc,.memesprite
 	cp a,MEW
 	jr z,.mew
 	cp a,MON_TREE
@@ -614,6 +610,22 @@ GetMonHeader:: ; 1537 (0:1537)
 .writeUpperByteOfFrontSprite
 	ld [wMonHFrontSprite + 1], a
 	jr .done
+.memesprite
+    push af
+    ld a,BANK(MemeSpritesTable)
+	ld [H_LOADEDROMBANK],a
+	ld [MBC1RomBank],a
+    pop af
+    ld hl, MemeSpritesTable
+    sub a, MON_KAPPA
+    add a, a
+    ld c, a
+    ld b, 0
+    add hl, bc
+    ld a, [hli]
+    ld d, [hl]
+    ld e, a
+    ld b, $77
 .specialID
 	ld hl,wMonHSpriteDim
 	ld [hl],b ; write sprite dimensions
@@ -647,6 +659,7 @@ GetMonHeader:: ; 1537 (0:1537)
 	ld [H_LOADEDROMBANK],a
 	ld [MBC1RomBank],a
 	ret
+
 
 ; copy party pokemon's name to wcd6d
 GetPartyMonName2:: ; 15b4 (0:15b4)
@@ -776,6 +789,10 @@ UncompressMonSprite:: ; 1627 (0:1627)
 	cp FOSSIL_KABUTOPS
 	ld a,BANK(FossilKabutopsPic)
 	jr z,.GotBank
+    ld a,b
+    cp MON_KAPPA
+    ld a,BANK(KappaPic)
+    jr nc,.GotBank
 	ld a,b
 	cp TANGELA + 1
 	ld a,BANK(TangelaPicFront)

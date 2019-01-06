@@ -6785,6 +6785,10 @@ INCLUDE "engine/overworld/elevator.asm"
 
 INCLUDE "engine/items/tm_prices.asm"
 
+SECTION "bank3B",ROMX,BANK[$3B]
+
+INCLUDE "engine/meme_sprites.asm"
+
 IF DEF(_OPTION_BEACH_HOUSE)
 SECTION "bank3C",ROMX[$4314],BANK[$3C]
 

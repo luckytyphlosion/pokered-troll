@@ -30,13 +30,34 @@ LanceCheckForChampResets:
 	
 	ld a, b
 	cp $3
-	ret c
+    ld hl, LanceTextPointers + $4 ; starts at LanceShop
+	jr nc, .setTP ; enable lance shop if 3+ tries
+	ld hl, LanceTextPointers
+.setTP
+	ld a, l
+	ld [wMapTextPtr], a
+	ld a, h
+	ld [wMapTextPtr+1], a
+	ret c ; if not 3+ tries, we're now done
 	
 	SetEvent EVENT_UNLOCKED_LANCE_SHOP
 	
+    ld a, b
 	cp $4
-	ret nc
-	
+	ret nc ; only show the nag once
+    
+    ld a, $1
+	ld [H_SPRITEINDEX], a
+    ld a, [wYCoord]
+    cp 1
+	ld a, SPRITE_FACING_UP
+    jr c, .setDirection ; player Y = 0, face up
+    jr nz, .showText ; player Y >= 2, stay facing down
+    ld a, SPRITE_FACING_LEFT
+.setDirection
+	ld [hSpriteFacingDirection], a
+	call SetSpriteFacingDirectionAndDelay
+.showText
 	ld a, $2
 	ld [hSpriteIndexOrTextID], a
 	jp DisplayTextID
@@ -163,9 +184,12 @@ LanceScript3: ; 5a382 (16:6382)
 	ret
 
 LanceTextPointers: ; 5a395 (16:6395)
+; Default Set
 	dw LanceText1
 	dw LanceText2
+; Lance Shop Set (used in map script)
 	dw LanceShopText
+    dw LanceText2
 
 LanceTrainerHeaders: ; 5a397 (16:6397)
 LanceTrainerHeader0: ; 5a397 (16:6397)
@@ -181,16 +205,8 @@ LanceTrainerHeader0: ; 5a397 (16:6397)
 
 LanceText1: ; 5a3a4 (16:63a4)
 	TX_ASM
-	CheckEvent EVENT_UNLOCKED_LANCE_SHOP
-	jr z, .talkToLance
-	ld a, $3
-	ld [hSpriteIndexOrTextID], a
-	call DisplayTextID
-	jr .textScriptEnd
-.talkToLance
 	ld hl, LanceTrainerHeader0
 	call TalkToTrainer
-.textScriptEnd
 	jp TextScriptEnd
 
 LanceText2:

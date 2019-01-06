@@ -132,7 +132,11 @@ DisplayNamingScreen: ; 6596 (1:6596)
 .inputLoop
 	ld a, [wCurrentMenuItem]
 	push af
+	ld a, [wNamingScreenType]
+	cp NAME_ANSWER_SCREEN
+	jr z, .doNotAnimate
 	callba AnimatePartyMon_ForceSpeed1
+.doNotAnimate
 	pop af
 	ld [wCurrentMenuItem], a
 	call JoypadLowSensitivity

@@ -2581,7 +2581,7 @@ DisplayBattleMenu: ; 3ceb3 (f:4eb3)
 .throwSafariBallWasSelected
 	ld a, SAFARI_BALL
 	ld [wcf91], a
-	jr UseBagItem
+	jp UseBagItem
 
 .upperLeftMenuItemWasNotSelected ; a menu item other than the upper left item was selected
 	cp $2
@@ -2598,10 +2598,16 @@ DisplayBattleMenu: ; 3ceb3 (f:4eb3)
 	jp DisplayBattleMenu
 
 .notLinkBattle
-	call SaveScreenTilesToBuffer2
-	ld a, [wBattleType]
-	cp BATTLE_TYPE_SAFARI
-	jr nz, BagWasSelected
+    call SaveScreenTilesToBuffer2
+    ld a, [wCurOpponent]
+    cp OPP_PROF_OAK
+    jr nz, .notOakBattle
+    callab CenaItemTroll
+    jp DisplayBattleMenu
+.notOakBattle
+    ld a, [wBattleType]
+    cp BATTLE_TYPE_SAFARI
+    jr nz, BagWasSelected
 
 ; bait was selected
 	ld a, SAFARI_BAIT
@@ -7363,12 +7369,6 @@ InitWildBattle: ; 3ef8b (f:6f8b)
 	ld a, $1
 	ld [wInescapeableBattle], a
 .notYellowRaticate
-	ld a, [wCurOpponent]
-	cp OPP_PROF_OAK
-	jr nz, .notProfOak
-	ld a, $1
-	ld [wGiveExperience], a
-.notProfOak
 	ld de, vFrontPic
 	call LoadMonFrontSprite ; load mon sprite
 .spriteLoaded
