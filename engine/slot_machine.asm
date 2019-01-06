@@ -451,7 +451,7 @@ SlotMachine_CheckForMatches: ; 37588 (d:7588)
 	pop hl
 	ld de, .flashScreenLoop
 	push de
-	jp [hl]
+	jp hl
 
 .flashScreenLoop
 	ld a, [rBGP]

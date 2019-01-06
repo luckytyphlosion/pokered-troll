@@ -62,7 +62,7 @@ BattleTransition: ; 7096d (1c:496d)
 	ld a, [hli]
 	ld h, [hl]
 	ld l, a
-	jp [hl]
+	jp hl
 
 ; the three GetBattleTransitionID functions set the first
 ; three bits of c, which determines what transition animation

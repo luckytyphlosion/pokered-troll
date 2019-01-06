@@ -1186,7 +1186,7 @@ DisplayTextBoxID_: ; 72ea (1:72ea)
 	ld l,a ; hl = address of function
 	ld de,.done
 	push de
-	jp [hl] ; jump to the function
+	jp hl ; jump to the function
 .coordTableMatch
 	call GetTextBoxIDCoords
 	call GetAddressOfScreenCoords
@@ -2186,7 +2186,7 @@ IsPlayerFacingEdgeOfMap: ; c3ff (3:43ff)
 	ld c, a
 	ld de, .asm_c41e
 	push de
-	jp [hl]
+	jp hl
 .asm_c41e
 	pop bc
 	pop de

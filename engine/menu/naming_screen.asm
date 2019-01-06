@@ -161,7 +161,7 @@ DisplayNamingScreen: ; 6596 (1:6596)
 	ld h, [hl]
 	ld l, a
 	push de
-	jp [hl]
+	jp hl
 
 .submitNickname
 	pop de

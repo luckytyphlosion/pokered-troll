@@ -4526,7 +4526,7 @@ JumpTable::
 	ld l, a
 	ld de, .returnAddress
 	push de
-	jp [hl]
+	jp hl
 .returnAddress
 	pop bc
 	pop de
@@ -4709,7 +4709,7 @@ CheckForHiddenObjectOrBookshelfOrCardKeyDoor:: ; 3eb5 (0:3eb5)
 	ld [H_LOADEDROMBANK], a
 	ld de, .returnAddress
 	push de
-	jp [hl]
+	jp hl
 .returnAddress
 	xor a
 	jr .done

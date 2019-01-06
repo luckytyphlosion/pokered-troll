@@ -31,7 +31,7 @@ JohnCenaBattleTurnScript:: ; 3b:4000
     ret
     
 CallHL:
-    jp [hl]
+    jp hl
     
 CenaTurnsJumpTable:
     dw FirstTurnTbolt

@@ -213,7 +213,7 @@ PlayAnimation: ; 780f1 (1e:40f1)
 	ld h,a
 	ld de,.nextAnimationCommand
 	push de
-	jp [hl] ; jump to special effect function
+	jp hl ; jump to special effect function
 .playSubanimation
 	ld c,a
 	and a,%00111111
@@ -462,7 +462,7 @@ PlayApplyingAttackAnimation: ; 78dbd (1e:4dbd)
 	ld a,[hli]
 	ld h,[hl]
 	ld l,a
-	jp [hl]
+	jp hl
 
 AnimationTypePointerTable: ; 78dcf (1e:4dcf)
 	dw ShakeScreenVertically ; enemy mon has used a damaging move without a side effect
@@ -647,7 +647,7 @@ DoSpecialEffectByAnimationId: ; 78ed7 (1e:4ed7)
 	ld l,a
 	ld de,.done
 	push de
-	jp [hl]
+	jp hl
 .done
 	pop bc
 	pop de
@@ -1092,7 +1092,7 @@ CallWithTurnFlipped: ; 79155 (1e:5155)
 	ld [H_WHOSETURN],a
 	ld de,.returnAddress
 	push de
-	jp [hl]
+	jp hl
 .returnAddress
 	pop af
 	ld [H_WHOSETURN],a

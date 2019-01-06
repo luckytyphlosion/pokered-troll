@@ -16,7 +16,7 @@ AnimateBoulderDust: ; 79f54 (1e:5f54)
 	ld bc, .returnAddress
 	push bc
 	ld c, 4
-	jp [hl]
+	jp hl
 .returnAddress
 	ld a, [rOBP1]
 	xor %01100100
