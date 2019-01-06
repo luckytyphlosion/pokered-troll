@@ -204,7 +204,7 @@ wTempoModifier:: ; c0f2
 	ds 13
 
 
-SECTION "Sprite State Data", WRAM0[$c100]
+SECTION "Sprite State Data", WRAM0
 
 wSpriteDataStart::
 
@@ -258,7 +258,7 @@ wSpriteStateData2:: ; c200
 wSpriteDataEnd::
 
 
-SECTION "OAM Buffer", WRAM0[$c300]
+SECTION "OAM Buffer", WRAM0
 
 wOAMBuffer:: ; c300
 ; buffer for OAM data. Copied to OAM by DMA
@@ -1551,9 +1551,7 @@ wEnemyMonAttack::    dw
 wEnemyMonDefense::   dw
 wEnemyMonSpeed::     dw
 wEnemyMonSpecial::   dw
-wEnemyMonPP::        ds 2 ; NUM_MOVES - 2
-SECTION "WRAM Bank 1", WRAMX, BANK[1]
-                     ds 2 ; NUM_MOVES - 2
+wEnemyMonPP::        ds 4 ; NUM_MOVES - 2
 
 wEnemyMonBaseStats:: ds 5
 wEnemyMonCatchRate:: ds 1
@@ -3210,7 +3208,7 @@ wBoxMonNicksEnd:: ; dee2
 wBoxDataEnd::
 
 
-SECTION "Stack", WRAMX[$dfff], BANK[1]
+SECTION "Stack", WRAM0
 wStack:: ; dfff
 
 

@@ -6,29 +6,29 @@ AUDIO_3 EQU $1f
 INCLUDE "constants.asm"
 
 
-SECTION "Sound Effect Headers 1", ROMX, BANK[AUDIO_1]
+SECTION "Sound Effect Headers 1", ROMX
 INCLUDE "audio/headers/sfxheaders1.asm"
 
-SECTION "Sound Effect Headers 2", ROMX, BANK[AUDIO_2]
+SECTION "Sound Effect Headers 2", ROMX
 INCLUDE "audio/headers/sfxheaders2.asm"
 
-SECTION "Sound Effect Headers 3", ROMX, BANK[AUDIO_3]
+SECTION "Sound Effect Headers 3", ROMX
 INCLUDE "audio/headers/sfxheaders3.asm"
 
 
 
-SECTION "Music Headers 1", ROMX, BANK[AUDIO_1]
+SECTION "Music Headers 1", ROMX
 INCLUDE "audio/headers/musicheaders1.asm"
 
-SECTION "Music Headers 2", ROMX, BANK[AUDIO_2]
+SECTION "Music Headers 2", ROMX
 INCLUDE "audio/headers/musicheaders2.asm"
 
-SECTION "Music Headers 3", ROMX, BANK[AUDIO_3]
+SECTION "Music Headers 3", ROMX
 INCLUDE "audio/headers/musicheaders3.asm"
 
 
 
-SECTION "Sound Effects 1", ROMX, BANK[AUDIO_1]
+SECTION "Sound Effects 1", ROMX
 
 INCLUDE "audio/sfx/snare1_1.asm"
 INCLUDE "audio/sfx/snare2_1.asm"
@@ -127,7 +127,7 @@ INCLUDE "audio/sfx/cry21_1.asm"
 INCLUDE "audio/sfx/cry22_1.asm"
 
 
-SECTION "Sound Effects 2", ROMX, BANK[AUDIO_2]
+SECTION "Sound Effects 2", ROMX
 
 INCLUDE "audio/sfx/snare1_2.asm"
 INCLUDE "audio/sfx/snare2_2.asm"
@@ -252,7 +252,7 @@ INCLUDE "audio/sfx/cry21_2.asm"
 INCLUDE "audio/sfx/cry22_2.asm"
 
 
-SECTION "Sound Effects 3", ROMX, BANK[AUDIO_3]
+SECTION "Sound Effects 3", ROMX
 
 INCLUDE "audio/sfx/snare1_3.asm"
 INCLUDE "audio/sfx/snare2_3.asm"
@@ -360,7 +360,7 @@ INCLUDE "audio/sfx/cry22_3.asm"
 
 
 
-SECTION "Audio Engine 1", ROMX, BANK[AUDIO_1]
+SECTION "Audio Engine 1", ROMX
 
 PlayBattleMusic:: ; 0x90c6
 	xor a
@@ -455,7 +455,7 @@ Music_Cities1AlternateTempo:: ; 0x9b81
 	jp Audio1_OverwriteChannelPointer
 
 
-SECTION "Audio Engine 2", ROMX, BANK[AUDIO_2]
+SECTION "Audio Engine 2", ROMX
 
 Music_DoLowHealthAlarm:: ; 2136e (8:536e)
 	ld a, [wLowHealthAlarm]
@@ -559,7 +559,7 @@ Audio2_OverwriteChannelPointer: ; 2231d (8:631d)
 	ret
 
 
-SECTION "Audio Engine 3", ROMX, BANK[AUDIO_3]
+SECTION "Audio Engine 3", ROMX
 
 PlayPokedexRatingSfx:: ; 7d13b (1f:513b)
 	ld a, [$ffdc]
@@ -603,7 +603,7 @@ INCLUDE "audio/engine_3.asm"
 
 
 
-SECTION "Music 1", ROMX, BANK[AUDIO_1]
+SECTION "Music 1", ROMX
 
 INCLUDE "audio/music/pkmnhealed.asm"
 INCLUDE "audio/music/routes1.asm"
@@ -632,7 +632,7 @@ INCLUDE "audio/music/gym.asm"
 INCLUDE "audio/music/pokecenter.asm"
 
 
-SECTION "Music 2", ROMX, BANK[AUDIO_2]
+SECTION "Music 2", ROMX
 
 INCLUDE "audio/sfx/pokeflute_ch1_ch2.asm"
 INCLUDE "audio/sfx/unused2_2.asm"
@@ -648,7 +648,7 @@ INCLUDE "audio/music/defeatedwildmon.asm"
 INCLUDE "audio/music/defeatedgymleader.asm"
 
 
-SECTION "Music 3", ROMX, BANK[AUDIO_3]
+SECTION "Music 3", ROMX
 
 INCLUDE "audio/music/bikeriding.asm"
 INCLUDE "audio/music/dungeon1.asm"

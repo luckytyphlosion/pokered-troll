@@ -52,7 +52,7 @@ red_opt  = $(dmg_opt) -t "POKEMON RED"
 blue_opt = $(dmg_opt) -t "POKEMON BLUE"
 
 poke%.gbc: $$(%_obj)
-	rgblink -n poke$*.sym -o $@ $^
+	rgblink -d -n poke$*.sym -l pokered.link -o $@ $^
 	rgbfix $($*_opt) $@
 
 %.png:  ;
